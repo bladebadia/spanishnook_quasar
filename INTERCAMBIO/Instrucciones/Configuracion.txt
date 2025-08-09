@@ -1,10 +1,12 @@
 1 - Ejecucion App:
         A - Abrir vscode
-        B - ctrl+shift+p y abrir en contenedor
-        C - Actualizar de github
+        B - Actualizar desde git hub: <git pull>
+        C - ctrl+shift+p y abrir en contenedor
         D - Abrir terminal en contenedor
         E - ejecutar <npm run dev>
+        F - Salir del contenedor a carpeta local
+        G - Para guardar cambios en git:
+             - git add .
+             - git commit -m " texto de la modificacion"
+             - git push
 
-2 - Actualizar dessde github
-
-3 - Actualizar cambios a github
