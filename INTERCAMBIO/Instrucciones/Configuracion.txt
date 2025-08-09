@@ -1,0 +1,10 @@
+1 - Ejecucion App:
+        A - Abrir vscode
+        B - ctrl+shift+p y abrir en contenedor
+        C - Actualizar de github
+        D - Abrir terminal en contenedor
+        E - ejecutar <npm run dev>
+
+2 - Actualizar dessde github
+
+3 - Actualizar cambios a github

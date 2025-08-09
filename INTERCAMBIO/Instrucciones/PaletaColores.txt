@@ -1,0 +1,6 @@
+1- Los colores predefinidos (Primary, secondary,accent,dark, positive,
+negative,info, warning), se establecen en el fichero src/css/quasar.variables.scss.
+
+2- En el fichero src/css/quasar.variables.scss se establecen las clases personalizadas y sus colores.
+
+3- Ademas se puede asignar cualquier color a un elemento concreto (de la paleta https://quasar.dev/style/color-palette) o por rgb.

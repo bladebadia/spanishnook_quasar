@@ -1,0 +1,28 @@
+OPCION 1:  Asignacion global (al body)
+            - Descargar fuente en /public/fonts
+            - Declarar fuente en /src/css/app.scss:
+                    @font-face {
+                        font-family: 'Morgan';
+                        src: url('/fonts/Morgan.ttf') format('truetype');
+                        font-weight: normal;
+                        font-style: normal;
+                    }
+            - Declarar clase para uso individual en /src/css/app.scss:
+                    .morgan-text {
+                        font-family: 'Morgan', sans-serif;
+                    }
+            - Asignar globalmente el tipo de fuente en /src/css/app.scss por orden de preferencia:
+                    body {
+                        font-family: 'Morgan', 'Beautiful Friends', 'Darling', sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        background-color: #f8f9fa;
+                    }
+
+OPCION 2: Asignar clase creada a un elemento concreto:
+            <h2 class="'Darling'">¡Bienvenido a Spanish Corner de nuevo!</h2>
+            
+
+
+CLASES PREDEFINIDAS PARA TEXTO:  https://quasar.dev/style/typography
+            

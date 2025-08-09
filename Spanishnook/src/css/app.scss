@@ -1,0 +1,40 @@
+// app global css in SCSS form
+@font-face {
+  font-family: 'Beautiful Friends';
+  src: url('public/fonts/Beautiful Friends.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.beatiful-friends {
+  font-family: 'Beautiful Friends', sans-serif;
+}
+
+@font-face {
+  font-family: 'Darling';
+  src: url('public/fonts/Darling.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.Darling {
+  font-family: 'Darling', sans-serif;
+}
+
+@font-face {
+  font-family: 'Morgan';
+  src: url('public/fonts/Morgan.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.Morgan {
+  font-family: 'Morgan', sans-serif;
+}
+
+// Puedes usar la fuente en todo el proyecto:
+body {
+  font-family: 'Darling', sans-serif;
+}
