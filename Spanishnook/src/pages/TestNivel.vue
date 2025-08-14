@@ -67,7 +67,7 @@
                 {{ testQuestions[currentQuestion - 1]?.question }}
               </h3>
 
-              <!-- Answer Options -->
+              <!-- Answer Options La expresión ${String.fromCharCode(65 + index)}. ${option} convierte el índice de la opción (0, 1, 2, 3, ...) en una letra del abecedario (A, B, C, D, ...), seguida de un punto y el texto de la opción.-->
               <div class="q-gutter-sm q-mb-lg">
                 <q-btn
                   v-for="(option, index) in testQuestions[currentQuestion - 1]?.options"
@@ -80,7 +80,7 @@
                   @click="selectAnswer(index)"
                 />
               </div>
-              <!-- Navigation -->
+              <!-- Boton anterior -->
               <div class="row justify-between">
                 <q-btn
                   v-if="currentQuestion > 1"
@@ -91,6 +91,7 @@
                   @click="previousQuestion"
                 />
                 <q-space />
+                <!-- Boton siguiente o finalizar -->
                 <q-btn
                   v-if="currentQuestion < testQuestions.length"
                   label="Siguiente"
@@ -113,6 +114,68 @@
         </div>
       </div>
     </div>
+    <!-- Results Page -->
+    <div v-if="showResults">
+      <div class="row justify-center">
+        <div class="col-12 col-md-8">
+          <q-card flat bordered class="results-card">
+            <q-card-section class="text-center">
+              <q-icon name="emoji_events" size="4rem" color="positive" class="q-mb-md" />
+              <h2 class="text-h3 text-primary text-weight-bold q-mb-md">¡Test Completado!</h2>
+
+              <div class="row justify-center items-center q-mb-lg">
+                <div class="col-12 col-sm-6 text-center">
+                  <q-circular-progress
+                    :value="(testScore / testQuestions.length) * 100"
+                    size="120px"
+                    :thickness="0.1"
+                    color="primary"
+                    track-color="grey-3"
+                    class="q-ma-md"
+                  >
+                    <div class="text-h4 text-weight-bold">
+                      {{ testScore }}/{{ testQuestions.length }}
+                    </div>
+                  </q-circular-progress>
+                  <div class="text-body1 text-grey-7">
+                    {{ Math.round((testScore / testQuestions.length) * 100) }}% Correcto
+                  </div>
+                </div>
+
+                <div class="col-12 col-sm-6 text-center">
+                  <div class="text-h4 text-weight-bold text-primary q-mb-sm">Tu Nivel:</div>
+                  <q-chip
+                    :label="testLevel"
+                    color="primary"
+                    text-color="white"
+                    size="lg"
+                    class="q-pa-md"
+                  />
+                  <div class="text-body2 text-grey-7 q-mt-sm">
+                    <span v-if="testLevel.includes('A1')">
+                      Principiante - Conoces lo básico del español
+                    </span>
+                    <span v-else-if="testLevel.includes('A2')">
+                      Elemental - Puedes comunicarte en situaciones simples
+                    </span>
+                    <span v-else-if="testLevel.includes('B1')">
+                      Intermedio - Tienes un buen dominio del idioma
+                    </span>
+                    <span v-else-if="testLevel.includes('B2')">
+                      Avanzado - Excelente conocimiento del español
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="q-gutter-md">
+                <q-btn label="Repetir Test" icon="refresh" color="secondary" @click="restartTest" />
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -125,8 +188,8 @@ import { ref } from 'vue';
 const currentQuestion = ref(0);
 const selectedAnswers = ref<number[]>([]);
 const testCompleted = ref(false);
-//const testScore = ref(0);
-//const testLevel = ref('');
+const testScore = ref(0);
+const testLevel = ref('');
 const showResults = ref(false);
 const testQuestions = [
   {
@@ -187,13 +250,38 @@ const testQuestions = [
 
 // Metodos
 const finishTest = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let score = 0;
   selectedAnswers.value.forEach((answer, index) => {
     if (testQuestions[index] && answer === testQuestions[index].correct) {
       score++;
     }
+    console.log(`Score: ${score}`);
   });
+
+  testScore.value = score;
+  const percentage = (score / testQuestions.length) * 100;
+
+  if (percentage >= 90) {
+    testLevel.value = 'B2 - Avanzado';
+  } else if (percentage >= 70) {
+    testLevel.value = 'B1 - Intermedio';
+  } else if (percentage >= 50) {
+    testLevel.value = 'A2 - Elemental';
+  } else {
+    testLevel.value = 'A1 - Principiante';
+  }
+
+  testCompleted.value = true;
+  showResults.value = true;
+};
+
+const restartTest = () => {
+  currentQuestion.value = 0;
+  selectedAnswers.value = [];
+  testCompleted.value = false;
+  testScore.value = 0;
+  testLevel.value = '';
+  showResults.value = false;
 };
 
 function selectAnswer(answerIndex: number) {
