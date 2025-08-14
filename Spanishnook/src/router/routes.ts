@@ -16,6 +16,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/EjerciciosEspañol', component: () => import('pages/EjerciciosEspañol.vue') },
       { path: '/ServiciosNook', component: () => import('pages/ServiciosNook.vue') },
       { path: '/SobreSpanish', component: () => import('pages/SobreSpanish.vue') },
+      { path: '/Login', component: () => import('pages/Login.vue') },
     ],
   },
 

@@ -18,6 +18,8 @@
         <q-btn to="/NuevoRegistro" flat dense class="text-white underline-btn q-mx-md"
           >Registro
         </q-btn>
+
+        <q-btn to="/Login" flat dense class="text-white underline-btn q-mx-md">Login </q-btn>
       </q-bar>
 
       <q-toolbar>
@@ -31,9 +33,7 @@
           @click="toggleLeftDrawer"
         />
         <q-toolbar-title> Spanish nook </q-toolbar-title>
-        <q-tabs class="justify-center q-m-lg" 
-          v-model="tab" shrink stretch
-          v-if="$q.screen.gt.sm">
+        <q-tabs class="justify-center q-m-lg" v-model="tab" shrink stretch v-if="$q.screen.gt.sm">
           <q-route-tab to="/IndexPage" name="tab1" label="Home" class="q-mx-md" />
           <q-btn-dropdown auto-close stretch flat label="Servicios">
             <q-list>
@@ -51,7 +51,7 @@
           <q-route-tab to="/TestNivel" name="tab3" label="Test de nivel" class="q-mx-md" />
           <q-route-tab to="/Contacto" name="tab4" label="Contacto" class="q-mx-md" />
         </q-tabs>
-        <q-space  v-if="$q.screen.gt.sm"/>
+        <q-space v-if="$q.screen.gt.sm" />
         <q-btn
           icon="smart_display"
           size="lg"
