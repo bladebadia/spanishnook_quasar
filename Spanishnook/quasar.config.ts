@@ -20,7 +20,7 @@ export default defineConfig((ctx) => {
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
       // 'ionicons-v4',
-       'mdi-v7',
+      'mdi-v7',
       // 'fontawesome-v6',
       // 'eva-icons',
       // 'themify',
@@ -44,7 +44,7 @@ export default defineConfig((ctx) => {
         // extendTsConfig (tsConfig) {}
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -61,7 +61,7 @@ export default defineConfig((ctx) => {
       // distDir
 
       // Configuración específica para contenedores Docker
-      extendViteConf (viteConf) {
+      extendViteConf(viteConf) {
         viteConf.server = {
           ...viteConf.server,
           host: '0.0.0.0',

@@ -8,7 +8,6 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('pages/IndexPage.vue') },
       { path: '/IndexPage', component: () => import('pages/IndexPage.vue') },
       { path: '/AreaPersonal', component: () => import('pages/AreaPersonal.vue') },
-      { path: '/NuevoRegistro', component: () => import('pages/NuevoRegistro.vue') },
       { path: '/TestNivel', component: () => import('pages/TestNivel.vue') },
       { path: '/ClasesGrupales', component: () => import('pages/ClasesGrupales.vue') },
       { path: '/ClasesIndividuales', component: () => import('pages/ClasesIndividuales.vue') },
@@ -16,7 +15,9 @@ const routes: RouteRecordRaw[] = [
       { path: '/EjerciciosEspañol', component: () => import('pages/EjerciciosEspañol.vue') },
       { path: '/ServiciosNook', component: () => import('pages/ServiciosNook.vue') },
       { path: '/SobreSpanish', component: () => import('pages/SobreSpanish.vue') },
-      { path: '/Login', component: () => import('pages/Login.vue') },
+      { path: '/Acceder', component: () => import('pages/Acceder.vue') },
+      { path: '/Registro', component: () => import('pages/Registro.vue') },
+      { path: '/AuthCallback', component: () => import('pages/AuthCallback.vue') },
     ],
   },
 

@@ -32,47 +32,34 @@
           :error-message="'Las contraseñas no coinciden'"
           dense
         />
-
-        <!-- Nivel de español -->
-        <q-select
-          filled
-          v-model="nivel"
-          :options="niveles"
-          label="Nivel de español"
-          class="q-mt-md"
-          dense
-        />
       </q-card-section>
 
       <q-card-actions align="right">
         <q-btn label="Registrarse" color="primary" @click="registrar" />
       </q-card-actions>
 
-      <!-- Enlace al login -->
       <q-card-section class="q-pt-none text-center">
-        <router-link to="/login" class="text-primary"> Ya tengo cuenta </router-link>
+        <router-link to="/Acceder" class="text-primary"> Ya tengo cuenta </router-link>
       </q-card-section>
     </q-card>
   </q-page>
 </template>
 
 <script setup lang="ts">
+defineOptions({ name: 'UserRegistro' });
 import { ref, computed } from 'vue';
-import { supabase } from 'src/supabaseClient';
+import { supabase } from '../supabaseClient';
 
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-const nivel = ref<string | null>(null);
 const mostrarErrores = ref(false);
 
-const niveles = ['A1', 'A2', 'B1', 'B2', 'C1'];
-
-// Reglas de contraseña
+// Regla de contraseña
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 const passwordValida = computed(() => passwordRegex.test(password.value));
 
-// Estados de error (solo después de intentar registrar)
+// Errores (solo después de intentar registrar)
 const passwordError = computed(() => mostrarErrores.value && !passwordValida.value);
 const confirmError = computed(
   () => mostrarErrores.value && confirmPassword.value !== password.value,
@@ -81,12 +68,7 @@ const confirmError = computed(
 async function registrar() {
   mostrarErrores.value = true;
 
-  if (
-    !email.value ||
-    !passwordValida.value ||
-    confirmPassword.value !== password.value ||
-    !nivel.value
-  ) {
+  if (!email.value || !passwordValida.value || confirmPassword.value !== password.value) {
     return;
   }
 
@@ -94,7 +76,7 @@ async function registrar() {
     email: email.value,
     password: password.value,
     options: {
-      data: { nivel: nivel.value }, // guarda el nivel como metadata del usuario
+      emailRedirectTo: 'http://localhost:9000/AuthCallback',
     },
   });
 
@@ -104,6 +86,5 @@ async function registrar() {
   }
 
   console.log('Usuario registrado:', data);
-  // Puedes redirigir al login o mostrar mensaje
 }
 </script>

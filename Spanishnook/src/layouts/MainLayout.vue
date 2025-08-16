@@ -15,11 +15,7 @@
           >Area Personal
         </q-btn>
 
-        <q-btn to="/NuevoRegistro" flat dense class="text-white underline-btn q-mx-md"
-          >Registro
-        </q-btn>
-
-        <q-btn to="/Login" flat dense class="text-white underline-btn q-mx-md">Login </q-btn>
+        <q-btn to="/Acceder" flat dense class="text-white underline-btn q-mx-md">Acceder </q-btn>
       </q-bar>
 
       <q-toolbar>
@@ -97,11 +93,6 @@ const linksList: EssentialLinkProps[] = [
     title: 'Test de nivel',
     icon: 'code',
     link: '/TestNivel',
-  },
-  {
-    title: 'Clases grupales',
-    icon: 'chat',
-    link: '/ClasesGrupales',
   },
   {
     title: 'Clases grupales',
