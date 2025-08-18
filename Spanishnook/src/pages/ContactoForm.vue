@@ -1,8 +1,5 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn fab icon="add" color="accent" label="Chat" />
-    </q-page-sticky>
     <div class="row justify-center">
       <div class="col-8 col-md-12">
         <q-card flat bordered style="max-width: 600px; width: 100%">

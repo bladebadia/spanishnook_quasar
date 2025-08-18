@@ -18,6 +18,9 @@ const routes: RouteRecordRaw[] = [
       { path: '/Acceder', component: () => import('pages/Acceder.vue') },
       { path: '/Registro', component: () => import('pages/Registro.vue') },
       { path: '/AuthCallback', component: () => import('pages/AuthCallback.vue') },
+      { path: 'Cookies', component: () => import('pages/legalCookies.vue') },
+      { path: 'Privacidad', component: () => import('pages/legalPrivacidad.vue') },
+      { path: 'Aviso', component: () => import('pages/legalAviso.vue') },
     ],
   },
 

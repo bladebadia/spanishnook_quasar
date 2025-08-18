@@ -10,3 +10,6 @@
              - git commit -m " texto de la modificacion"
              - git push
 
+2- Asociacion Bolt: 
+        El proyecto Spanishnook_quasar de github corresponde al proyecto
+        SpanishnookBoltQuasar en Bolt

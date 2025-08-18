@@ -1,43 +1,19 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+  <q-page class="column items-center q-pa-xl">
+    <img src="/public/img/estudiante_1024.jpg"  />
+    <div class="row items-center justify-evenly full-width">
+      <div class="col-12 col-md-6">
+        <h1 class="text-h3">Bienvenido a Spanish Nook</h1>
+        <p class="q-mt-md">Tu espacio para aprender y practicar español de manera efectiva y divertida.</p>
+      </div>
+      <div class="col-12 col-md-6">
+        <img src="/src/assets/SpanishNookBanner.png" alt="Spanish Nook Banner" class="full-width" />
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
 
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1',
-  },
-  {
-    id: 2,
-    content: 'ct2 este modificado',
-  },
-  {
-    id: 3,
-    content: 'ct3',
-  },
-  {
-    id: 4,
-    content: 'ct4 ahora este otro',
-  },
-  {
-    id: 5,
-    content: 'ct5 y este que tal',
-  },
-]);
-
-const meta = ref<Meta>({
-  totalCount: 1200,
-});
 </script>
