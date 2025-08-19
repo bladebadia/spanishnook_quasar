@@ -3,40 +3,53 @@
     <div class="q-mb-md text-h5">Registro</div>
 
     <q-card class="q-pa-md" style="width: 400px; max-width: 90vw">
-      <q-card-section>
-        <!-- Email -->
-        <q-input filled v-model="email" label="Correo electrónico" type="email" dense />
+      <!-- Formulario para manejar el submit con Enter -->
+      <form @submit.prevent="registrar">
+        <q-card-section>
+          <!-- Email -->
+          <q-input
+            filled
+            v-model="email"
+            label="Correo electrónico"
+            type="email"
+            dense
+            @keyup.enter="registrar"
+          />
 
-        <!-- Contraseña -->
-        <q-input
-          filled
-          v-model="password"
-          label="Contraseña"
-          type="password"
-          class="q-mt-md"
-          :error="passwordError"
-          :hide-bottom-space="!passwordError"
-          :error-message="'La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y símbolo'"
-          dense
-        />
+          <!-- Contraseña -->
+          <q-input
+            filled
+            v-model="password"
+            label="Contraseña"
+            type="password"
+            class="q-mt-md"
+            :error="passwordError"
+            :hide-bottom-space="!passwordError"
+            :error-message="'La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y símbolo'"
+            dense
+            @keyup.enter="registrar"
+          />
 
-        <!-- Confirmar contraseña -->
-        <q-input
-          filled
-          v-model="confirmPassword"
-          label="Confirmar contraseña"
-          type="password"
-          class="q-mt-md"
-          :error="confirmError"
-          :hide-bottom-space="!confirmError"
-          :error-message="'Las contraseñas no coinciden'"
-          dense
-        />
-      </q-card-section>
+          <!-- Confirmar contraseña -->
+          <q-input
+            filled
+            v-model="confirmPassword"
+            label="Confirmar contraseña"
+            type="password"
+            class="q-mt-md"
+            :error="confirmError"
+            :hide-bottom-space="!confirmError"
+            :error-message="'Las contraseñas no coinciden'"
+            dense
+            @keyup.enter="registrar"
+          />
+        </q-card-section>
 
-      <q-card-actions align="right">
-        <q-btn label="Registrarse" color="primary" @click="registrar" />
-      </q-card-actions>
+        <q-card-actions align="right">
+          <!-- Cambiado a type="submit" -->
+          <q-btn label="Registrarse" color="primary" type="submit" />
+        </q-card-actions>
+      </form>
 
       <q-card-section class="q-pt-none text-center">
         <router-link to="/Acceder" class="text-primary"> Ya tengo cuenta </router-link>
@@ -49,11 +62,13 @@
 defineOptions({ name: 'UserRegistro' });
 import { ref, computed } from 'vue';
 import { supabase } from '../supabaseClient';
+import { useRouter } from 'vue-router';
 
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const mostrarErrores = ref(false);
+const router = useRouter();
 
 // Regla de contraseña
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -83,6 +98,8 @@ async function registrar() {
   if (error) {
     console.error('Error registrando:', error.message);
     return;
+  } else {
+    await router.push('/CheckEmail');
   }
 
   console.log('Usuario registrado:', data);

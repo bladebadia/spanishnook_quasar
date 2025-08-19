@@ -3,11 +3,13 @@
     <q-header elevated>
       <q-bar class="">
         <q-space></q-space>
-        <q-btn to="/AreaPersonal" flat dense class="text-white underline-btn q-mx-md"
+        <q-btn to="/AreaPersonal" v-if="user" flat dense class="text-white underline-btn q-mx-md"
           >Area Personal
         </q-btn>
 
-        <q-btn to="/Acceder" flat dense class="text-white underline-btn q-mx-md">Acceder </q-btn>
+        <q-btn to="/Acceder" v-if="!user" flat dense class="text-white underline-btn q-mx-md"
+          >Acceder
+        </q-btn>
         <div class="row items-center q-gutter-sm" style="width: 100%; max-width: 250px">
           <span class="text-body1" style="white-space: nowrap">Idioma:</span>
           <q-select
@@ -164,6 +166,9 @@
 import { ref } from 'vue';
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
 import { useI18n } from 'vue-i18n';
+import { useAuth } from 'src/stores/auth';
+
+const { user } = useAuth();
 const { locale } = useI18n();
 //import router from 'src/router';
 
@@ -252,6 +257,5 @@ const tab = ref('');
     padding: 12px !important;
     box-sizing: content-box;
   }
-  
 }
 </style>

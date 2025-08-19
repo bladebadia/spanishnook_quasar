@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
+import { useAuth } from 'src/stores/auth';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -7,7 +8,16 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
       { path: '/IndexPage', component: () => import('pages/IndexPage.vue') },
-      { path: '/AreaPersonal', component: () => import('pages/AreaPersonal.vue') },
+      {
+        path: '/AreaPersonal',
+        component: () => import('pages/AreaPersonal.vue'),
+        beforeEnter: () => {
+          const { user } = useAuth();
+          if (!user.value) {
+            return '/Acceder';
+          }
+        },
+      },
       { path: '/TestNivel', component: () => import('pages/TestNivel.vue') },
       { path: '/ClasesGrupales', component: () => import('pages/ClasesGrupales.vue') },
       { path: '/ClasesIndividuales', component: () => import('pages/ClasesIndividuales.vue') },
@@ -23,7 +33,11 @@ const routes: RouteRecordRaw[] = [
       { path: 'Aviso', component: () => import('pages/legalAviso.vue') },
     ],
   },
-
+  {
+    path: '/CheckEmail',
+    component: () => import('src/layouts/EmptyLayout.vue'),
+    children: [{ path: '', component: () => import('pages/CheckEmail.vue') }],
+  },
   // Always leave this as last one,
   // but you can also remove it
   {
