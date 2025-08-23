@@ -1,15 +1,31 @@
 <template>
   <q-page class="q-pa-lg">
     <h4>Área Personal</h4>
-    <p>Bienvenido {{ user?.email }}</p>
 
-    <q-btn
-      color="negative"
-      label="Cerrar sesión"
-      icon="logout"
-      @click="handleLogout"
-      :loading="loading"
-    />
+    <!-- Directamente en el template -->
+    <p v-if="user?.user_metadata?.nombre">¡Hola {{ user.user_metadata.nombre }}!</p>
+    <p v-else-if="user?.email">Bienvenido {{ user.email }}</p>
+    <p v-else>¡Hola Usuario!</p>
+
+    <div class="column items-start">
+      <!-- Botón azul para HorarioReserva -->
+      <q-btn
+        color="blue"
+        label="Reservar Horario"
+        icon="schedule"
+        @click="goToHorarioReserva"
+        class="q-mb-md"
+      />
+
+      <!-- Botón de logout -->
+      <q-btn
+        color="negative"
+        label="Cerrar sesión"
+        icon="logout"
+        @click="handleLogout"
+        :loading="loading"
+      />
+    </div>
   </q-page>
 </template>
 
@@ -18,28 +34,24 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from 'src/stores/auth';
 
-//import { useQuasar } from 'quasar';
-
-//const $q = useQuasar();
 const { user, logout } = useAuth();
 const router = useRouter();
 const loading = ref(false);
+
+async function goToHorarioReserva() {
+  try {
+    await router.push('/HorarioReserva');
+  } catch (error) {
+    console.error('Error navegando a HorarioReserva:', error);
+  }
+}
 
 async function handleLogout() {
   loading.value = true;
   try {
     await logout();
-    //$q.notify({
-    //type: 'positive',
-    //message: 'Sesión cerrada correctamente',
-    //});
     await router.push('/IndexPage');
   } catch (error: unknown) {
-    //const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    //$q.notify({
-    //type: 'negative',
-    //message: `Error al cerrar sesión: ${errorMessage}`,
-    //});
     console.error('Logout error:', error);
   } finally {
     loading.value = false;

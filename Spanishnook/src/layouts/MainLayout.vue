@@ -6,10 +6,13 @@
         <q-btn to="/AreaPersonal" v-if="user" flat dense class="text-white underline-btn q-mx-md"
           >Area Personal
         </q-btn>
-
+        <q-btn to="/HorarioReserva" v-if="user" flat dense class="text-white underline-btn q-mx-md"
+          >Reserva
+        </q-btn>
         <q-btn to="/Acceder" v-if="!user" flat dense class="text-white underline-btn q-mx-md"
           >Acceder
         </q-btn>
+
         <div class="row items-center q-gutter-sm" style="width: 100%; max-width: 250px">
           <span class="text-body1" style="white-space: nowrap">Idioma:</span>
           <q-select
