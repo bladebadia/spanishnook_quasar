@@ -2,6 +2,30 @@
   <q-page class="q-pa-lg">
     <h4>Reserva de Horarios</h4>
 
+    <!-- Reservas temporales pendientes -->
+    <div v-if="reservasTemporales.length > 0" class="q-mb-lg bg-yellow-2 q-pa-md rounded-borders">
+      <h6>Reservas Pendientes de Confirmación</h6>
+      <q-list bordered>
+        <q-item v-for="reserva in reservasTemporales" :key="reserva.id">
+          <q-item-section>
+            <q-item-label>{{ formatFecha(reserva.fecha) }} a las {{ reserva.hora }}</q-item-label>
+            <q-item-label caption>
+              Expira en: {{ calcularTiempoRestante(reserva.expira_en) }}
+            </q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-btn
+              color="positive"
+              icon="check"
+              @click="confirmarReserva(reserva.id)"
+              size="sm"
+              label="Confirmar"
+            />
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
     <!-- Calendario -->
     <div class="row justify-center q-mb-lg">
       <q-date
@@ -20,12 +44,12 @@
 
       <div class="row q-gutter-sm">
         <q-btn
-          v-for="hora in horariosDisponibles"
-          :key="hora"
-          color="primary"
+          v-for="hora in todosLosHorarios"
+          :key="`${hora}-${horariosDisponibles.includes(hora)}`"
+          :color="horariosDisponibles.includes(hora) ? 'primary' : 'grey'"
           :label="hora"
           @click="reservarHora(hora)"
-          :disabled="reservando"
+          :disabled="!horariosDisponibles.includes(hora) || reservando"
           outline
         />
       </div>
@@ -35,38 +59,47 @@
       </div>
     </div>
 
-    <!-- Mis reservas -->
+    <!-- Mis reservas CONFIRMADAS -->
     <div class="q-mt-xl">
-      <h5>Mis reservas</h5>
+      <h5>Mis Reservas Confirmadas</h5>
       <q-list bordered v-if="misReservas.length > 0">
         <q-item v-for="reserva in misReservas" :key="reserva.id">
           <q-item-section>
             <q-item-label>{{ formatFecha(reserva.fecha) }} a las {{ reserva.hora }}</q-item-label>
-            <q-item-label caption>Estado: {{ reserva.estado }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-btn color="negative" icon="delete" @click="cancelarReserva(reserva.id)" size="sm" />
           </q-item-section>
         </q-item>
       </q-list>
-      <p v-else class="text-grey">No tienes reservas activas.</p>
+      <p v-else class="text-grey">No tienes reservas confirmadas.</p>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
 import { useAuth } from 'src/stores/auth';
 import { supabase } from 'src/supabaseClient';
-import { useQuasar } from 'quasar';
 
-const $q = useQuasar();
+interface Reserva {
+  id: string;
+  user_id: string;
+  fecha: string;
+  hora: string;
+  estado: string;
+  expira_en?: string;
+  created_at?: string;
+}
+
 const { user } = useAuth();
 
 const fechaSeleccionada = ref('');
 const horariosDisponibles = ref<string[]>([]);
-const misReservas = ref<any[]>([]);
+const misReservas = ref<Reserva[]>([]);
+const reservasTemporales = ref<Reserva[]>([]);
 const reservando = ref(false);
+const temporizador = ref<number | null>(null);
 
 // Fechas mínima y máxima (3 meses vista)
 const fechaMinima = new Date().toISOString().split('T')[0];
@@ -83,10 +116,11 @@ const todosLosHorarios = [
   '11:00',
   '12:00',
   '13:00',
-  '14:00',
   '15:00',
   '16:00',
   '17:00',
+  '18:00',
+  '19:00',
 ];
 
 // Opciones para fechas disponibles
@@ -99,22 +133,15 @@ const opcionesFechas = (date: string) => {
   today.setHours(0, 0, 0, 0);
   maxDate.setHours(0, 0, 0, 0);
 
-  if (selectedDate < today) {
-    return false;
-  }
-  if (selectedDate > maxDate) {
-    return false;
-  }
+  if (selectedDate < today) return false;
+  if (selectedDate > maxDate) return false;
+
   const day = selectedDate.getDay();
-  if (day === 0 || day === 6) {
-    return false;
-  }
-  return true;
+  return day !== 0 && day !== 6; // Excluir fines de semana
 };
 
 // Formatear fecha
 const formatFecha = (fecha: string) => {
-  // ✅ Tipo string
   return new Date(fecha).toLocaleDateString('es-ES', {
     weekday: 'long',
     year: 'numeric',
@@ -123,24 +150,44 @@ const formatFecha = (fecha: string) => {
   });
 };
 
+// Calcular tiempo restante
+const calcularTiempoRestante = (expiraEn: string | undefined) => {
+  if (!expiraEn) return '';
+
+  const ahora = new Date();
+  const expira = new Date(expiraEn);
+  const diffMs = expira.getTime() - ahora.getTime();
+  const diffMins = Math.max(0, Math.floor(diffMs / 60000));
+
+  return `${diffMins} minutos`;
+};
+
 // Cargar horarios disponibles
 const cargarHorariosDisponibles = async (fecha: string) => {
-  // ✅ Tipo string
-  if (!fecha) return;
+  if (!fecha) {
+    horariosDisponibles.value = [];
+    return;
+  }
 
   try {
-    // Obtener reservas existentes para esta fecha
-    const { data: reservasExistentes } = await supabase
+    const ahora = new Date().toISOString();
+
+    const { data: reservasExistentes, error } = await supabase
       .from('reservas')
       .select('hora')
       .eq('fecha', fecha)
-      .in('estado', ['pendiente', 'confirmada']);
+      .or('estado.in.(pendiente,confirmada),and(estado.eq.temporal,expira_en.gt.' + ahora + ')');
 
-    // Filtrar horarios disponibles
+    if (error) {
+      console.error('Error cargando horarios ocupados:', error);
+      return;
+    }
+
     const horasOcupadas = reservasExistentes?.map((r) => r.hora) || [];
     horariosDisponibles.value = todosLosHorarios.filter((hora) => !horasOcupadas.includes(hora));
   } catch (error) {
     console.error('Error cargando horarios:', error);
+    horariosDisponibles.value = [];
   }
 };
 
@@ -148,47 +195,166 @@ const cargarHorariosDisponibles = async (fecha: string) => {
 const reservarHora = async (hora: string) => {
   if (!user.value?.id || !fechaSeleccionada.value) return;
 
+  // Validación frontend
+  if (!horariosDisponibles.value.includes(hora)) {
+    alert('Este horario ya está reservado. Por favor, elige otro.');
+    return;
+  }
+
   reservando.value = true;
   try {
-    const { data, error } = await supabase
-      .from('reservas')
-      .insert({
-        user_id: user.value.id,
-        fecha: fechaSeleccionada.value,
-        hora: hora,
-        estado: 'pendiente',
-      })
-      .select();
+    const expiraEn = new Date();
+    expiraEn.setMinutes(expiraEn.getMinutes() + 15);
 
-    if (error) throw error;
+    const { error } = await supabase.from('reservas').insert({
+      user_id: user.value.id,
+      fecha: fechaSeleccionada.value,
+      hora: hora,
+      estado: 'temporal',
+      expira_en: expiraEn.toISOString(),
+    });
 
-    //$q.notify({
-    //type: 'positive',
-    //message: `Reserva confirmada para el ${formatFecha(fechaSeleccionada.value)} a las ${hora}`,
-    //});
+    if (error) {
+      // Manejo específico de error de duplicado
+      if (error.code === '23505') {
+        alert(
+          'Este horario acaba de ser reservado. Por favor, actualiza la página y elige otro horario.',
+        );
+        // Recargar horarios disponibles
+        await cargarHorariosDisponibles(fechaSeleccionada.value);
+        return;
+      }
+      throw error;
+    }
 
-    // Recargar datos
-    await cargarHorariosDisponibles(fechaSeleccionada.value);
-    await cargarMisReservas();
+    alert('⏳ Reserva temporal creada. Tienes 15 minutos para confirmar.');
+
+    // Actualizar UI inmediatamente
+    horariosDisponibles.value = horariosDisponibles.value.filter((h) => h !== hora);
+    await cargarReservasTemporales();
   } catch (error) {
-    //$q.notify({
-    //type: 'negative',
-    //message: 'Error al realizar la reserva',
-    // });
+    console.error('Error realizando reserva:', error);
+    alert('Error al realizar la reserva');
   } finally {
     reservando.value = false;
   }
 };
 
-// Cargar mis reservas
-const cargarMisReservas = async () => {
-  if (!user.value?.id) return;
+// Confirmar reserva permanente
+const confirmarReserva = async (reservaId: string) => {
+  try {
+    const { error } = await supabase
+      .from('reservas')
+      .update({
+        estado: 'confirmada',
+        expira_en: null,
+      })
+      .eq('id', reservaId);
+
+    if (error) throw error;
+
+    alert('✅ Reserva confirmada permanentemente');
+    await cargarMisReservas();
+    await cargarReservasTemporales();
+    if (fechaSeleccionada.value) {
+      await cargarHorariosDisponibles(fechaSeleccionada.value);
+    }
+  } catch (error) {
+    console.error('Error confirmando reserva:', error);
+    alert('Error al confirmar la reserva');
+  }
+};
+
+// Verificar y limpiar reservas expiradas
+// Verificar y limpiar reservas expiradas - MEJORADA
+const verificarReservasExpiradas = async () => {
+  try {
+    const ahora = new Date().toISOString();
+
+    const { data: expiradas, error: selectError } = await supabase
+      .from('reservas')
+      .select('*')
+      .lt('expira_en', ahora)
+      .eq('estado', 'temporal');
+
+    if (selectError) {
+      console.error('Error buscando reservas expiradas:', selectError);
+      return;
+    }
+
+    console.log('Reservas expiradas encontradas:', expiradas?.length);
+
+    const { error: deleteError } = await supabase
+      .from('reservas')
+      .delete()
+      .lt('expira_en', ahora)
+      .eq('estado', 'temporal');
+
+    if (deleteError) {
+      console.error('Error eliminando reservas expiradas:', deleteError);
+      return;
+    }
+
+    console.log('Reservas expiradas eliminadas');
+
+    await Promise.all([
+      cargarReservasTemporales(),
+      fechaSeleccionada.value
+        ? cargarHorariosDisponibles(fechaSeleccionada.value)
+        : Promise.resolve(),
+    ]);
+  } catch (error) {
+    console.error('Error en verificación de expirados:', error);
+  }
+};
+
+// Iniciar temporizador
+const iniciarTemporizador = () => {
+  if (temporizador.value !== null) {
+    clearInterval(temporizador.value);
+  }
+
+  temporizador.value = window.setInterval(() => {
+    void verificarReservasExpiradas();
+  }, 60000);
+};
+
+// Cargar reservas temporales
+const cargarReservasTemporales = async () => {
+  if (!user.value?.id) {
+    reservasTemporales.value = [];
+    return;
+  }
 
   try {
     const { data, error } = await supabase
       .from('reservas')
       .select('*')
       .eq('user_id', user.value.id)
+      .eq('estado', 'temporal')
+      .order('expira_en', { ascending: true });
+
+    if (error) throw error;
+    reservasTemporales.value = data || [];
+  } catch (error) {
+    console.error('Error cargando reservas temporales:', error);
+    reservasTemporales.value = [];
+  }
+};
+
+// Cargar mis reservas (excluyendo temporales)
+const cargarMisReservas = async () => {
+  if (!user.value?.id) {
+    misReservas.value = [];
+    return;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('user_id', user.value.id)
+      .neq('estado', 'temporal')
       .gte('fecha', new Date().toISOString().split('T')[0])
       .order('fecha', { ascending: true })
       .order('hora', { ascending: true });
@@ -197,6 +363,7 @@ const cargarMisReservas = async () => {
     misReservas.value = data || [];
   } catch (error) {
     console.error('Error cargando reservas:', error);
+    misReservas.value = [];
   }
 };
 
@@ -220,15 +387,29 @@ const cancelarReserva = async (reservaId: string) => {
   }
 };
 
-// Watchers y lifecycle
-onMounted(() => {
-  cargarMisReservas();
+// Cleanup
+onUnmounted(() => {
+  if (temporizador.value !== null) {
+    clearInterval(temporizador.value);
+  }
 });
+
+// Watchers y lifecycle
+onMounted(async () => {
+  await verificarReservasExpiradas();
+
+  // cargar datos
+  await Promise.all([cargarMisReservas(), cargarReservasTemporales()]);
+
+  // Iniciar temporizador
+  iniciarTemporizador();
+});
+
 watch(
   () => fechaSeleccionada.value,
   (nuevaFecha: string) => {
     if (nuevaFecha) {
-      cargarHorariosDisponibles(nuevaFecha);
+      void cargarHorariosDisponibles(nuevaFecha);
     }
   },
 );

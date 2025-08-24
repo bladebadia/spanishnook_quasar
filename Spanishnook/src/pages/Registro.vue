@@ -6,7 +6,6 @@
       <!-- Formulario para manejar el submit con Enter -->
       <form @submit.prevent="registrar">
         <q-card-section>
-          <!-- Nombre/Apodo - SOLO espacio cuando hay error -->
           <q-input
             filled
             v-model="nombre"
@@ -16,7 +15,6 @@
             :hide-bottom-space="true"
           />
 
-          <!-- Email - SOLO espacio cuando hay error -->
           <q-input
             filled
             v-model="email"
@@ -29,7 +27,6 @@
             :hide-bottom-space="!errorMessage"
           />
 
-          <!-- Contraseña - SOLO espacio cuando hay error -->
           <q-input
             filled
             v-model="password"
@@ -45,8 +42,6 @@
                 : ''
             "
           />
-
-          <!-- Confirmar contraseña - SOLO espacio cuando hay error -->
           <q-input
             filled
             v-model="confirmPassword"
@@ -112,28 +107,12 @@ async function registrar() {
   }
 
   try {
-    // MÉTODO CORRECTO: Intentar iniciar sesión para ver si el usuario existe
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: email.value,
-      password: 'dummy_password_incorrect', // Contraseña incorrecta a propósito
-    });
-
-    // Si el error es de credenciales inválidas, el usuario EXISTE
-    if (signInError && signInError.message.includes('Invalid login credentials')) {
-      errorMessage.value = 'Este correo electrónico ya está registrado. Por favor, inicia sesión.';
-      loading.value = false;
-      return;
-    }
-
-    // Si hay otro error diferente, puede que el usuario no exista
-    // o que haya otro problema, procedemos con el registro
-
-    // Intentar el registro
+    // Intentar el registro directamente
     const { data, error } = await supabase.auth.signUp({
       email: email.value,
       password: password.value,
       options: {
-        emailRedirectTo: 'http://localhost:9000/AuthCallback',
+        emailRedirectTo: window.location.origin + '/AuthCallback',
         data: {
           nombre: nombre.value,
         },
@@ -146,29 +125,27 @@ async function registrar() {
         error.message.includes('already registered') ||
         error.message.includes('User already exists') ||
         error.message.includes('already exists') ||
-        error.message.includes('user already exists')
+        error.message.includes('user already exists') ||
+        error.code === 'user_already_exists'
       ) {
         errorMessage.value =
           'Este correo electrónico ya está registrado. Por favor, inicia sesión.';
       } else {
         errorMessage.value = `Error al registrarse: ${error.message}`;
       }
-      console.error('Error registrando:', error.message);
+      console.error('Error registrando:', error);
       loading.value = false;
       return;
     }
 
     console.log('Usuario registrado:', data);
 
-    // Verificar si realmente se creó el usuario o si ya existía
-    if (data.user?.identities?.length === 0) {
-      // Esto significa que el usuario ya existía pero no se creó identidad nueva
+    // Verificar si realmente se creó el usuario
+    if (data.user && data.user.identities && data.user.identities.length > 0) {
+      await router.push('/CheckEmail');
+    } else {
       errorMessage.value = 'Este correo electrónico ya está registrado. Por favor, inicia sesión.';
-      loading.value = false;
-      return;
     }
-
-    await router.push('/CheckEmail');
   } catch (error) {
     console.error('Error inesperado:', error);
     errorMessage.value = 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.';
