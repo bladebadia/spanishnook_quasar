@@ -1,7 +1,8 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lHh Lpr fff" >
     <q-header elevated>
       <q-bar class="">
+        
         <q-space></q-space>
         <q-btn to="/AreaPersonal" v-if="user" flat dense class="text-white underline-btn q-mx-md"
           >Area Personal
@@ -10,6 +11,7 @@
         <q-btn to="/Acceder" v-if="!user" flat dense class="text-white underline-btn q-mx-md"
           >Acceder
         </q-btn>
+        <q-separator size="180px" color="white" />
         <div class="row items-center q-gutter-sm" style="width: 100%; max-width: 250px">
           <span class="text-body1" style="white-space: nowrap">Idioma:</span>
           <q-select
@@ -106,22 +108,26 @@
         aria-label="WhatsApp"
       />
     </q-page-sticky>
-    <q-footer class="bg-grey-2 text-grey-8">
-      <div class="row flex q-pa-xl">
-        <div class="col-12 col-sm-4 flex column items-start q-pl-xl q-ml-xl">
-          <h5 class="text-bold q-pa-none q-ma-none items-start">Spanish nook</h5>
-          <p class="q-pr-md q-mr-md">
+    <q-footer class="bg-black text-white" >
+      <div class="row flex q-pa-md">
+        <div class="col-12 col-md-3 flex column items-center">
+          <q-img src="/src/assets/SpanishNookLogo.png" class="img-responsiva" />
+        </div>          
+        <div class="col-12 col-md-3 flex column items-center q-pa-none q-ma-none ">
+          <h5 class="text-bold  items-center q-pa-none q-ma-none">Spanish nook</h5>
+          <p class="q-ma-md text-subtitle1 ">
             Spanish nook es un lugar donde puedes aprender español de manera divertida y efectiva.
             Ofrecemos clases grupales e individuales, ejercicios interactivos y recursos para
             mejorar tu nivel de español.
           </p>
         </div>
         <!-- Columna Mapa del sitio -->
-        <div class="col-12 col-sm-4 flex column items-start">
+        <div class="col-12 col-md-3 flex column items-center">
           <div class="text-bold q-mx-xs">
-            <h5 class="text-bold q-pa-none q-ma-none items-start">Mapa del sitio</h5>
+            <h5 class="text-bold q-pa-none q-ma-none items-center">Mapa del sitio</h5>
           </div>
-          <router-link to="/IndexPage" class="footer-link q-mb-xs">Inicio</router-link>
+          
+          <router-link to="/IndexPage" class="footer-link q-mb-xs q-mt-md">Inicio</router-link>
           <router-link to="/sobreSpanish" class="footer-link q-mb-xs"
             >Sobre Spanish Nook</router-link
           >
@@ -138,24 +144,24 @@
           <router-link to="/Contacto" class="footer-link">Contacto</router-link>
         </div>
         <!-- Columna Enlaces de interés -->
-        <div class="col-12 col-sm-3 flex column">
-          <div class="text-bold q-mb-xs">
-            <h5 class="text-bold q-pa-none q-ma-none items-start">Enlaces de interes</h5>
+        <div v-if="$q.screen.gt.sm" class="col-12 col-md-3 flex column">
+          <div class="text-bold">
+            <h5 class="text-bold  items-center q-ma-none">Enlaces de interes</h5>
           </div>
-          <a href="https://www.cervantes.es/" target="_blank" rel="noopener" class="q-mb-xs"
+          <a href="https://www.cervantes.es/" target="_blank" rel="noopener" class="footer-link q-mt-md"
             >Instituto Cervantes</a
           >
-          <a href="https://www.rae.es/" target="_blank" rel="noopener" class="q-mb-xs">RAE</a>
-          <a href="https://www.dele.org/" target="_blank" rel="noopener">DELE</a>
+          <a href="https://www.rae.es/" target="_blank" rel="noopener" class="footer-link ">RAE</a>
+          <a href="https://www.dele.org/" target="_blank" rel="noopener" class="footer-link ">DELE</a>
         </div>
       </div>
 
       <q-bar class="footer-bar">
-        <div class="row flex items-center full-width no-wrap">
+        <div class="row flex items-center full-width">
           <div class="q-mr-lg">© 2025 Spanishnook · Todos los derechos reservados</div>
-          <router-link to="/Aviso" class="q-px-xl q-mx-xl">Aviso Legal</router-link>
-          <router-link to="/Privacidad" class="q-px-xl q-mx-xl">Política de Privacidad</router-link>
-          <router-link to="/Cookies" class="q-px-xl q-mx-xl">Política de Cookies</router-link>
+          <router-link to="/Aviso" class="q-px-md q-mx-md">Aviso Legal</router-link>
+          <router-link to="/Privacidad" class="q-px-md q-mx-md">Política de Privacidad</router-link>
+          <router-link to="/Cookies" class="q-px-md q-mx-md">Política de Cookies</router-link>
         </div>
       </q-bar>
     </q-footer>
@@ -234,14 +240,20 @@ const tab = ref('');
 </style>
 
 <style>
+.img-responsiva {
+  width: 100%;
+  height: auto;
+  max-width: 250px;
+  max-height: 250px;
+}
 .footer-link {
-  color: #310ff3e7 !important;
+  color: white !important;
   font-weight: bold;
   text-decoration: none !important;
   display: inline-block;
 }
 .footer-link:hover {
-  color: #483c24 !important;
+  color: #de1212 !important;
   transform: translateX(8px);
 }
 
