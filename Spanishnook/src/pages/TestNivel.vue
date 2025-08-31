@@ -13,11 +13,17 @@
           <div class="text-left q-mb-lg">
             <h3 class="text-h5 text-weight-bold q-mb-md">Instrucciones:</h3>
             <ul class="text-body1 text-grey-8">
-              <li class="q-mb-sm">El test consta de 8 preguntas de diferentes niveles</li>
-              <li class="q-mb-sm">Cada pregunta tiene 4 opciones de respuesta</li>
-              <li class="q-mb-sm">Puedes navegar entre preguntas usando los botones</li>
-              <li class="q-mb-sm">Al final recibirás tu nivel estimado (A1, A2, B1, B2)</li>
-              <li class="q-mb-sm">El test toma aproximadamente 5-10 minutos</li>
+              <li class="q-mb-sm">El test consta de 25 preguntas secuenciadas por niveles</li>
+              <li class="q-mb-sm">
+                Cada pregunta tiene 3 opciones de respuesta, selecciona una. Cuando creas que no
+                sabes/puedes continuar con el test, deja las preguntas en blanco
+              </li>
+              <li class="q-mb-sm">
+                Al completar el test recibirás tu nivel de español (A1, A2, B1, B2, C1). Ten en
+                cuenta: el resultado de este test es una orientación aproximada de tu nivel de
+                español. No sustituye a una evaluación oficial.
+              </li>
+              <li class="q-mb-sm">El test toma aproximadamente 10 minutos</li>
             </ul>
           </div>
 
@@ -153,16 +159,24 @@
                   />
                   <div class="text-body2 text-grey-7 q-mt-sm">
                     <span v-if="testLevel.includes('A1')">
-                      Principiante - Conoces lo básico del español
+                      Acceso - Conoces lo básico del español: presentarse, hablar de uno mismo y
+                      usar frases básicas de uso cotidiano.
                     </span>
                     <span v-else-if="testLevel.includes('A2')">
-                      Elemental - Puedes comunicarte en situaciones simples
+                      Plataforma - Puedes comunicarte en situaciones simples con frases sencillas
+                      para la vida diaria: compras, trabajo, familia y ocio.
                     </span>
                     <span v-else-if="testLevel.includes('B1')">
-                      Intermedio - Tienes un buen dominio del idioma
+                      Umbral - Tienes dominio intermedio del idioma. Eres capaz de entender y
+                      desenvolverte en conversaciones y textos claros. Hablar de experiencias y
+                      planes.
                     </span>
                     <span v-else-if="testLevel.includes('B2')">
-                      Avanzado - Excelente conocimiento del español
+                      Avanzado - Puedes comunicarte con fluidez con personas nativas, expresar
+                      opiniones y entender temas complejos.
+                    </span>
+                    <span v-else-if="testLevel.includes('C1')">
+                      Dominio - Te expresas con soltura y naturalidad en casi cualquier situación.
                     </span>
                   </div>
                 </div>
@@ -193,58 +207,160 @@ const testLevel = ref('');
 const showResults = ref(false);
 const testQuestions = [
   {
-    question: "¿Cómo se dice 'Hello' en español?",
-    options: ['Adiós', 'Hola', 'Gracias', 'Por favor'],
-    correct: 1,
-    level: 'A1',
-  },
-  {
-    question: "¿Cuál es la forma correcta del verbo 'ser' para 'yo'?",
-    options: ['soy', 'eres', 'es', 'somos'],
-    correct: 0,
-    level: 'A1',
-  },
-  {
-    question: "¿Qué significa 'Me gusta la música'?",
-    options: ["I don't like music", 'I like music', 'I play music', 'I hear music'],
-    correct: 1,
-    level: 'A2',
-  },
-  {
-    question: "¿Cuál es el pretérito perfecto de 'comer' para 'él'?",
-    options: ['come', 'comió', 'ha comido', 'comía'],
-    correct: 2,
-    level: 'A2',
-  },
-  {
-    question: '¿Qué expresión usarías para dar una opinión?',
-    options: ['Me parece que...', 'Hay que...', 'Tengo que...', 'Voy a...'],
-    correct: 0,
-    level: 'B1',
-  },
-  {
-    question:
-      "¿Cuál es la diferencia entre 'por' y 'para' en esta frase: 'Estudió ___ tres horas ___ el examen'?",
-    options: ['por, por', 'para, para', 'por, para', 'para, por'],
-    correct: 2,
-    level: 'B1',
-  },
-  {
-    question: '¿Qué tiempo verbal expresa una acción hipotética en el pasado?',
+    question: "1 ¿Cómo se escribe '2976' en español?",
     options: [
-      'Condicional simple',
-      'Subjuntivo imperfecto',
-      'Condicional compuesto',
-      'Pluscuamperfecto',
+      'mil dos novecentos setenta y seis',
+      'dos mil novecientos sesenta y seis',
+      'dos mil novecientos setenta y seis',
+    ],
+    correct: 2,
+    level: 'A1',
+  },
+  {
+    question: "2 ¿Cuál es la forma correcta del verbo 'ser' para 'yo'?",
+    options: ['soy', 'eres', 'es'],
+    correct: 0,
+    level: 'A1',
+  },
+  {
+    question: '3 El profesor tiene muchos ___,',
+    options: ['lápiz', 'lápices', 'lápizs'],
+    correct: 1,
+    level: 'A1',
+  },
+  {
+    question: "4 ¿Cuál es el femenino de: 'el gato / ___'?",
+    options: ['el gata', 'la gata', 'las gatas'],
+    correct: 1,
+    level: 'A1',
+  },
+  {
+    question: '5 Completa: nosotros ___ a las 7 de la mañana.',
+    options: ['despertamos nos', 'despiertamos', 'nos despertamos'],
+    correct: 2,
+    level: 'A1',
+  },
+  {
+    question: '6 Completa: hoy (yo) ___ un examen difícil.',
+    options: ['estoy', 'tiene', 'tengo'],
+    correct: 2,
+    level: 'A1',
+  },
+  {
+    question: '7 Hoy ___ (comer, nosotros) una ensalada muy rica.',
+    options: ['comemos', 'hemos comido', 'comerábamos'],
+    correct: 1,
+    level: 'A2',
+  },
+  {
+    question: '8 ¿___ (ir, vosotros) al concierto ayer?',
+    options: ['fuisteis', 'fuiste', 'iban'],
+    correct: 0,
+    level: 'A2',
+  },
+  {
+    question: '9 Acuérdate de comprar los huevos y de ____ (poner) en la nevera.',
+    options: ['poner', 'ponerlos', 'ponelo'],
+    correct: 1,
+    level: 'A2',
+  },
+  {
+    question: '10 Mañana voy ___ Valencia ___ tren.',
+    options: ['a/en', 'en/en', 'para/a'],
+    correct: 0,
+    level: 'A2',
+  },
+  {
+    question: '11 Para comprar un buen collar debes ir a una ___.',
+    options: ['droguería', 'joyería', 'charcutería'],
+    correct: 1,
+    level: 'A2',
+  },
+  {
+    question: '12 Por favor chicos, ___ las manos antes de comer.',
+    options: ['lavais', 'lavad', 'lavaos'],
+    correct: 2,
+    level: 'B1',
+  },
+  {
+    question: '13 ¡Ojalá ___ el examen de lengua!',
+    options: ['aprobar', 'aprobemos', 'aprobamos'],
+    correct: 1,
+    level: 'B1',
+  },
+  {
+    question: '14 Espero que ___ un buen trabajo pronto.',
+    options: ['conseguimos', 'conseguir', 'consigamos'],
+    correct: 2,
+    level: 'B1',
+  },
+  {
+    question: '15 Hoy llueve mucho ___ no saldremos a pasear.',
+    options: ['así que', 'porque', 'como'],
+    correct: 0,
+    level: 'B1',
+  },
+  {
+    question: '16 ¿Qué expresión usarías para dar una opinión?',
+    options: ['Me parece que...', 'Hay que...', 'Tengo que...'],
+    correct: 0,
+    level: 'B1',
+  },
+  {
+    question: '18 Cuando Carla llegó al trabajo, la reunión ya ___.',
+    options: ['empezó', 'ha empezado', 'había empezado'],
+    correct: 2,
+    level: 'B1',
+  },
+  {
+    question: '19 No encuentro el móvil, ___ en casa.',
+    options: ['me lo habré dejado', 'me lo habría dejado', 'me lo olvidaré'],
+    correct: 0,
+    level: 'B2',
+  },
+  {
+    question: '20 Aunque el viaje ___ peligroso, creo que valdría la pena.',
+    options: ['es', 'ha sido', 'fuese'],
+    correct: 2,
+    level: 'B2',
+  },
+  {
+    question: '¿Cuál de estas frases utiliza la palabra “realizar” de forma correcta?',
+    options: [
+      'Mañana voy a realizar un café para mis amigos.',
+      'Finalmente logró realizar su sueño de estudiar en el extranjero.',
+      'No pude realizar a tu hermano en la fiesta porque había mucha gente.',
+    ],
+    correct: 1,
+    level: 'B2',
+  },
+  {
+    question: '22 ¿Cuál de las siguientes frases está formulada correctamente?',
+    options: [
+      'Aunque estaba cansado, pero terminó el trabajo a tiempo.',
+      'Mañana voy a haber terminado el informe antes de la reunión.',
+      'Si hubiera sabido la respuesta, la habría dicho sin dudar.',
     ],
     correct: 2,
     level: 'B2',
   },
   {
-    question: '¿Cuál es el uso correcto del subjuntivo en esta frase?',
-    options: ['Espero que vienes', 'Espero que vengas', 'Espero que vendrás', 'Espero que viniste'],
+    question: '23 Mi abuelo tiene 90 años pero está fenomenal, ___.',
+    options: ['está como una cabra', 'está como una vaca', 'está como un roble'],
+    correct: 2,
+    level: 'C1',
+  },
+  {
+    question: '24 Me pareció increíble que ___ aquel traje para la fiesta.',
+    options: ['se ponga,', 'se hubiera puesto', 'se haya puesto'],
     correct: 1,
-    level: 'B2',
+    level: 'C1',
+  },
+  {
+    question: '25 Lucas siempre dice que la profesora es guapísima y maravillosa. ¡___!',
+    options: ['es un pelota,', 'es un pringao', 'es un maceta'],
+    correct: 0,
+    level: 'C1',
   },
 ];
 
@@ -261,14 +377,15 @@ const finishTest = () => {
   testScore.value = score;
   const percentage = (score / testQuestions.length) * 100;
 
-  if (percentage >= 90) {
-    testLevel.value = 'B2 - Avanzado';
-  } else if (percentage >= 70) {
-    testLevel.value = 'B1 - Intermedio';
-  } else if (percentage >= 50) {
-    testLevel.value = 'A2 - Elemental';
-  } else {
-    testLevel.value = 'A1 - Principiante';
+  if (percentage >= 100) {
+    testLevel.value = 'C1 - Dominio';
+    if (percentage >= 90) {
+      testLevel.value = 'B2 - Avanzado';
+    } else if (percentage >= 70) {
+      testLevel.value = 'B1 - Intermedio';
+    } else if (percentage >= 50) {
+      testLevel.value = 'A2 - Plataforma';
+    } else testLevel.value = 'A1 - Acceso';
   }
 
   testCompleted.value = true;
@@ -307,3 +424,7 @@ const previousQuestion = () => {
 // testScore.value = score;
 // testLevel.value = getTestLevel(score);
 </script>
+
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
