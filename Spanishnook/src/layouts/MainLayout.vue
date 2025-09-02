@@ -43,14 +43,15 @@
         />
 
         <img
-          src="/img/logoiso_320.png"
+          round
+          src="/img/Logotexto_500.png"
           alt="Logo Spanish nook"
           style="height: 50px; width: auto; min-width: 0; margin: 0; padding: 0; display: inline-block;"
           fit="contain"
           class="q-mr-md"
         />
         <q-toolbar-title> Spanish nook </q-toolbar-title>
-        <q-tabs class="justify-center q-m-lg"  shrink stretch v-if="$q.screen.gt.sm">
+        <q-tabs class="flex flex-justify justify-center align-justify q-m-lg"  shrink stretch v-if="$q.screen.gt.sm">
           <q-route-tab to="/IndexPage" name="tab1" Class="q-tab" >Inicio</q-route-tab>
           <q-route-tab to="/sobreSpanish" name="tab5" Class="q-tab" >Sobre Spanish Nook</q-route-tab>
           <q-btn-dropdown auto-close stretch flat class="q-tab q-pb-sm" label="Clases">
@@ -66,45 +67,11 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-route-tab to="/TestNivel" name="tab3" class="q-mx-md q-tab">Test de nivel</q-route-tab>
-          <q-route-tab to="/Contacto" name="tab4" class="q-mx-md q-tab">Contacto</q-route-tab>
+          <q-route-tab to="/TestNivel" name="tab3" class=" q-tab">Test de nivel</q-route-tab>
+          <q-route-tab to="/Contacto" name="tab4" class=" q-tab">Contacto</q-route-tab>
         </q-tabs>
         <q-space v-if="$q.screen.gt.sm" />
-        <q-btn
-          icon="mdi-facebook"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-ml-md"
-          href="@paulafromthenook"
-        />
-        <q-btn
-          icon="mdi-instagram"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-mr-lg q-pr-lg"
-          href="@paulaspanishnook"
-        />
-        <q-btn
-          icon="mdi-whatsapp"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-mr-lg q-pr-lg"
-          href="@paulaspanishnook"
-        />
-        <q-btn
-          icon="mdi-youtube"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-mr-lg q-pr-lg"
-          href="@paulaspanishnook"
-        />
-        <q-btn
-          icon="mdi-mail"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-mr-lg q-pr-lg"
-          href="@paulaspanishnook"
-        />
+        
       </q-toolbar>
     </q-header>
     <!-- El sticky debe ir fuera de <q-page-container> y antes del footer -->
@@ -117,6 +84,21 @@
     </q-drawer>
 
     <q-page-container>
+      <q-banner
+          v-if="showCookiesBanner"
+          class="bg-primary text-white shadow-2 cookies-banner"
+          style="position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); width: 70vw; max-width: 900px; z-index: 9999; font-size: 1.25rem; border-radius: 18px; padding: 24px 32px;"
+          icon="cookie"
+        >
+          <div class="row items-center justify-between">
+            <div style="line-height: 1.5;">
+              Este sitio web utiliza cookies propias y de terceros para mejorar la experiencia de usuario y analizar el tráfico. Si continúas navegando, consideramos que aceptas su uso.
+              <q-btn flat dense color="white" label="Política de Cookies" to="/Cookies" class="q-ml-sm" />
+            </div>
+            <q-btn color="white" text-color="primary" label="Aceptar" @click="aceptarCookies" class="q-ml-md text-weight-bold" style="font-size: 1.1rem; padding: 8px 24px; border-radius: 8px;" />
+          </div>
+        </q-banner>
+
       <router-view />
     </q-page-container>
 
@@ -135,8 +117,9 @@
     </q-page-sticky>
     <q-footer class="bg-black text-white" >
       <div class="row flex q-pa-md">
-        <div class="col-12 col-md-3 flex column items-center">
-          <q-img src="/src/assets/SpanishNookLogo.png" class="img-responsiva" />
+        <div class="col-12 col-md-3 flex column items-center align-center q-pt-lg">
+          <q-img src="/img/Logotexto_500.png" class="img-responsiva" />
+          
         </div>          
         <div class="col-12 col-md-3 flex column items-center q-pa-none q-ma-none ">
           <h5 class="text-bold  items-center q-pa-none q-ma-none">Spanish nook</h5>
@@ -178,7 +161,46 @@
           >
           <a href="https://www.rae.es/" target="_blank" rel="noopener" class="footer-link ">RAE</a>
           <a href="https://www.dele.org/" target="_blank" rel="noopener" class="footer-link ">DELE</a>
+          <div class="q-ma-none q-pa-none" >
+          <h5 class="text-bold  items-center q-pa-none q-my-none">Síguenos en redes sociales</h5>
+        <q-btn
+          icon="mdi-facebook"
+          size="lg"
+          flat
+          class="text-primary underline-btn q-sm-ml-xl"
+          href="@paulafromthenook"
+        />
+        <q-btn
+          icon="mdi-instagram"
+          size="lg"
+          flat
+          class="text-primary underline-btn q-sm-mr-lg q-pr-lg"
+          href="@paulaspanishnook"
+        />
+        <q-btn
+          icon="mdi-whatsapp"
+          size="lg"
+          flat
+          class="text-primary underline-btn q-sm-mr-lg q-pr-lg"
+          href="@paulaspanishnook"
+        />
+        <q-btn
+          icon="mdi-youtube"
+          size="lg"
+          flat
+          class="text-primary underline-btn q-sm-mr-lg q-pr-lg"
+          href="@paulaspanishnook"
+        />
+        <q-btn
+          icon="mdi-mail"
+          size="lg"
+          flat
+          class="text-primary underline-btn q-sm-mr-lg q-pr-lg"
+          href="@paulaspanishnook"
+        />
         </div>
+        </div>
+        
       </div>
 
       <q-bar class="footer-bar">
@@ -194,7 +216,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+
+// Banner de cookies
+const showCookiesBanner = ref(false);
+function aceptarCookies() {
+  localStorage.setItem('cookies_accepted', 'true');
+  showCookiesBanner.value = false;
+}
+onMounted(() => {
+  showCookiesBanner.value = localStorage.getItem('cookies_accepted') !== 'true';
+});
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
 import { useI18n } from 'vue-i18n';
 import { useAuth } from 'src/stores/auth';
