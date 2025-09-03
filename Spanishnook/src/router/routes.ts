@@ -31,6 +31,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/Cookies', component: () => import('pages/legalCookies.vue') },
       { path: '/Privacidad', component: () => import('pages/legalPrivacidad.vue') },
       { path: '/Aviso', component: () => import('pages/legalAviso.vue') },
+      { path: '/Condiciones', component: () => import('pages/legalCondicionesVenta.vue') },
       { path: '/HorarioReserva', component: () => import('pages/HorarioReserva.vue') },
       { path: '/ResetPassword', component: () => import('pages/ResetPassword.vue') },
       { path: '/CarritoCompra', component: () => import('pages/CarritoCompra.vue') },
