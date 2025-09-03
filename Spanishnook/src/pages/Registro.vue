@@ -42,6 +42,7 @@
                 : ''
             "
           />
+
           <q-input
             filled
             v-model="confirmPassword"
@@ -53,6 +54,31 @@
             :hide-bottom-space="!(confirmError && mostrarErrores)"
             :error-message="confirmError && mostrarErrores ? 'Las contraseñas no coinciden' : ''"
           />
+
+          <!-- Checkbox de condiciones de privacidad -->
+          <div class="q-mt-md">
+            <div class="row items-center no-wrap">
+              <q-checkbox
+                v-model="aceptoPrivacidad"
+                :error="privacidadError && mostrarErrores"
+                class="q-mr-sm"
+              />
+
+              <span class="text-cursor">
+                Acepto los
+                <router-link to="/Privacidad" class="text-primary text-weight-bold" @click.stop>
+                  términos y condiciones de privacidad
+                </router-link>
+              </span>
+            </div>
+
+            <div
+              v-if="privacidadError && mostrarErrores"
+              class="text-negative text-caption q-mt-xs"
+            >
+              Debes aceptar los términos y condiciones
+            </div>
+          </div>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -77,6 +103,7 @@ const nombre = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+const aceptoPrivacidad = ref(false);
 const mostrarErrores = ref(false);
 const errorMessage = ref('');
 const loading = ref(false);
@@ -89,18 +116,20 @@ const passwordValida = computed(() => passwordRegex.test(password.value));
 // Errores (solo después de intentar registrar)
 const passwordError = computed(() => !passwordValida.value);
 const confirmError = computed(() => confirmPassword.value !== password.value);
+const privacidadError = computed(() => !aceptoPrivacidad.value);
 
 async function registrar() {
   loading.value = true;
   mostrarErrores.value = true;
   errorMessage.value = '';
 
-  // Validaciones básicas
+  // Validaciones básicas (incluyendo privacidad)
   if (
     !nombre.value ||
     !email.value ||
     !passwordValida.value ||
-    confirmPassword.value !== password.value
+    confirmPassword.value !== password.value ||
+    !aceptoPrivacidad.value
   ) {
     loading.value = false;
     return;
@@ -115,6 +144,8 @@ async function registrar() {
         emailRedirectTo: window.location.origin + '/AuthCallback',
         data: {
           nombre: nombre.value,
+          acepto_privacidad: true,
+          fecha_aceptacion: new Date().toISOString(),
         },
       },
     });
@@ -154,3 +185,13 @@ async function registrar() {
   }
 }
 </script>
+
+<style scoped>
+/* Opcional: mejorar el estilo del enlace dentro del checkbox */
+.text-primary {
+  text-decoration: underline;
+}
+.text-primary:hover {
+  text-decoration: none;
+}
+</style>

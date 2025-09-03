@@ -1,8 +1,7 @@
 <template>
-  <q-layout view="lHh Lpr fff" >
+  <q-layout view="lHh Lpr fff">
     <q-header elevated>
       <q-bar class="">
-        
         <q-space></q-space>
         <q-btn to="/AreaPersonal" v-if="user" flat dense class="text-white underline-btn q-mx-md"
           >Area Personal
@@ -46,16 +45,29 @@
           round
           src="/img/Logotexto_500.png"
           alt="Logo Spanish nook"
-          style="height: 50px; width: auto; min-width: 0; margin: 0; padding: 0; display: inline-block;"
+          style="
+            height: 50px;
+            width: auto;
+            min-width: 0;
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+          "
           fit="contain"
           class="q-mr-md"
         />
         <q-toolbar-title> Spanish nook </q-toolbar-title>
+<<<<<<< HEAD
         <q-tabs class="flex flex-justify justify-center align-justify q-m-lg"  shrink stretch v-if="$q.screen.gt.sm">
           <q-route-tab to="/IndexPage" name="tab1" Class="q-tab" >Inicio</q-route-tab>
           <q-route-tab to="/sobreSpanish" name="tab5" Class="q-tab" >Sobre Spanish Nook</q-route-tab>
+=======
+        <q-tabs class="justify-center q-m-lg" shrink stretch v-if="$q.screen.gt.sm">
+          <q-route-tab to="/IndexPage" name="tab1" Class="q-tab">Inicio</q-route-tab>
+          <q-route-tab to="/sobreSpanish" name="tab5" Class="q-tab">Sobre Spanish Nook</q-route-tab>
+>>>>>>> be02899a25d65fe1a8a75d2aa155acd6f98c6970
           <q-btn-dropdown auto-close stretch flat class="q-tab q-pb-sm" label="Clases">
-            <q-list >
+            <q-list>
               <q-item clickable @click="$router.push('/ClasesGrupales')">
                 <q-item-section class="q-tab">Clases grupales</q-item-section>
               </q-item>
@@ -115,8 +127,9 @@
         aria-label="WhatsApp"
       />
     </q-page-sticky>
-    <q-footer class="bg-black text-white" >
+    <q-footer class="bg-black text-white">
       <div class="row flex q-pa-md">
+<<<<<<< HEAD
         <div class="col-12 col-md-3 flex column items-center align-center q-pt-lg">
           <q-img src="/img/Logotexto_500.png" class="img-responsiva" />
           
@@ -124,6 +137,14 @@
         <div class="col-12 col-md-3 flex column items-center q-pa-none q-ma-none ">
           <h5 class="text-bold  items-center q-pa-none q-ma-none">Spanish nook</h5>
           <p class="q-ma-md text-subtitle1 ">
+=======
+        <div class="col-12 col-md-3 flex column items-center">
+          <q-img src="/src/assets/SpanishNookLogo.png" class="img-responsiva" />
+        </div>
+        <div class="col-12 col-md-3 flex column items-center q-pa-none q-ma-none">
+          <h5 class="text-bold items-center q-pa-none q-ma-none">Spanish nook</h5>
+          <p class="q-ma-md text-subtitle1">
+>>>>>>> be02899a25d65fe1a8a75d2aa155acd6f98c6970
             Spanish nook es un lugar donde puedes aprender español de manera divertida y efectiva.
             Ofrecemos clases grupales e individuales, ejercicios interactivos y recursos para
             mejorar tu nivel de español.
@@ -134,7 +155,7 @@
           <div class="text-bold q-mx-xs">
             <h5 class="text-bold q-pa-none q-ma-none items-center">Mapa del sitio</h5>
           </div>
-          
+
           <router-link to="/IndexPage" class="footer-link q-mb-xs q-mt-md">Inicio</router-link>
           <router-link to="/sobreSpanish" class="footer-link q-mb-xs"
             >Sobre Spanish Nook</router-link
@@ -154,11 +175,16 @@
         <!-- Columna Enlaces de interés -->
         <div v-if="$q.screen.gt.sm" class="col-12 col-md-3 flex column">
           <div class="text-bold">
-            <h5 class="text-bold  items-center q-ma-none">Enlaces de interes</h5>
+            <h5 class="text-bold items-center q-ma-none">Enlaces de interes</h5>
           </div>
-          <a href="https://www.cervantes.es/" target="_blank" rel="noopener" class="footer-link q-mt-md"
+          <a
+            href="https://www.cervantes.es/"
+            target="_blank"
+            rel="noopener"
+            class="footer-link q-mt-md"
             >Instituto Cervantes</a
           >
+<<<<<<< HEAD
           <a href="https://www.rae.es/" target="_blank" rel="noopener" class="footer-link ">RAE</a>
           <a href="https://www.dele.org/" target="_blank" rel="noopener" class="footer-link ">DELE</a>
           <div class="q-ma-none q-pa-none" >
@@ -198,6 +224,12 @@
           class="text-primary underline-btn q-sm-mr-lg q-pr-lg"
           href="@paulaspanishnook"
         />
+=======
+          <a href="https://www.rae.es/" target="_blank" rel="noopener" class="footer-link">RAE</a>
+          <a href="https://www.dele.org/" target="_blank" rel="noopener" class="footer-link"
+            >DELE</a
+          >
+>>>>>>> be02899a25d65fe1a8a75d2aa155acd6f98c6970
         </div>
         </div>
         
