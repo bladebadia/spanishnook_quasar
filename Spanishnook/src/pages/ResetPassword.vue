@@ -105,7 +105,7 @@ const resetPassword = async () => {
 
     success.value = true;
     setTimeout(() => {
-      router.push('/Acceder');
+      void router.push('/Acceder');
     }, 2000);
   } catch (error) {
     console.error('Error restableciendo contraseña:', error);
