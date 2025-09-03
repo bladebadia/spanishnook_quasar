@@ -2,28 +2,32 @@
   <q-page class="q-pa-lg">
     <h4>Reserva de Horarios</h4>
 
-    <!-- Reservas temporales pendientes -->
-    <div v-if="reservasTemporales.length > 0" class="q-mb-lg bg-yellow-2 q-pa-md rounded-borders">
-      <h6>Reservas Pendientes de Confirmación</h6>
+    <!-- Carrito de reservas CON CONTADOR -->
+    <div v-if="carrito.length > 0" class="q-mb-lg bg-blue-1 q-pa-md rounded-borders">
+      <h6>🛒 Carrito de Reservas</h6>
       <q-list bordered>
-        <q-item v-for="reserva in reservasTemporales" :key="reserva.id">
+        <q-item v-for="(reserva, index) in carrito" :key="index">
           <q-item-section>
             <q-item-label>{{ formatFecha(reserva.fecha) }} a las {{ reserva.hora }}</q-item-label>
-            <q-item-label caption>
-              Expira en: {{ calcularTiempoRestante(reserva.expira_en) }}
+            <q-item-label caption v-if="reserva.expira_en">
+              ⏳ Expira en: {{ tiempoRestante(reserva.expira_en) }}
             </q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-btn
-              color="positive"
-              icon="check"
-              @click="confirmarReserva(reserva.id)"
+              color="negative"
+              icon="remove"
+              @click="quitarDelCarrito(index)"
               size="sm"
-              label="Confirmar"
+              round
             />
           </q-item-section>
         </q-item>
       </q-list>
+
+      <div class="q-mt-md text-right">
+        <q-btn color="primary" label="Ir al Carrito" to="/CarritoCompra" />
+      </div>
     </div>
 
     <!-- Calendario -->
@@ -42,21 +46,18 @@
     <div v-if="fechaSeleccionada" class="q-mt-lg">
       <h5>Horarios disponibles para {{ formatFecha(fechaSeleccionada) }}</h5>
 
-      <div class="row q-gutter-sm">
+      <div v-if="horariosDisponiblesFiltrados.length > 0" class="row q-gutter-sm">
         <q-btn
-          v-for="hora in todosLosHorarios"
-          :key="`${hora}-${horariosDisponibles.includes(hora)}`"
-          :color="horariosDisponibles.includes(hora) ? 'primary' : 'grey'"
+          v-for="hora in horariosDisponiblesFiltrados"
+          :key="hora"
+          :color="estaEnCarrito(hora) ? 'orange' : 'primary'"
           :label="hora"
-          @click="reservarHora(hora)"
-          :disabled="!horariosDisponibles.includes(hora) || reservando"
+          @click="agregarAlCarrito(hora)"
           outline
         />
       </div>
 
-      <div v-if="horariosDisponibles.length === 0" class="text-grey q-mt-md">
-        No hay horarios disponibles para esta fecha.
-      </div>
+      <div v-else class="text-grey q-mt-md">No hay horarios disponibles para esta fecha.</div>
     </div>
 
     <!-- Mis reservas CONFIRMADAS -->
@@ -82,7 +83,14 @@ import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
 import { useAuth } from 'src/stores/auth';
 import { supabase } from 'src/supabaseClient';
 
-interface Reserva {
+interface ReservaCarrito {
+  id?: string;
+  fecha: string;
+  hora: string;
+  expira_en?: string;
+}
+
+interface ReservaConfirmada {
   id: string;
   user_id: string;
   fecha: string;
@@ -95,11 +103,11 @@ interface Reserva {
 const { user } = useAuth();
 
 const fechaSeleccionada = ref('');
-const horariosDisponibles = ref<string[]>([]);
-const misReservas = ref<Reserva[]>([]);
-const reservasTemporales = ref<Reserva[]>([]);
-const reservando = ref(false);
-const temporizador = ref<number | null>(null);
+//const horariosDisponibles = ref<string[]>([]);
+const horasOcupadas = ref<string[]>([]);
+const misReservas = ref<ReservaConfirmada[]>([]);
+const carrito = ref<ReservaCarrito[]>([]);
+const temporizadorReserva = ref<number | null>(null);
 
 // Fechas mínima y máxima (3 meses vista)
 const fechaMinima = new Date().toISOString().split('T')[0];
@@ -122,6 +130,13 @@ const todosLosHorarios = [
   '18:00',
   '19:00',
 ];
+
+// Horarios disponibles filtrados (excluyendo ocupados y mostrando solo disponibles)
+const horariosDisponiblesFiltrados = computed(() => {
+  return todosLosHorarios.filter(
+    (hora) => !horasOcupadas.value.includes(hora) && !estaEnCarrito(hora),
+  );
+});
 
 // Opciones para fechas disponibles
 const opcionesFechas = (date: string) => {
@@ -150,199 +165,239 @@ const formatFecha = (fecha: string) => {
   });
 };
 
-// Calcular tiempo restante
-const calcularTiempoRestante = (expiraEn: string | undefined) => {
-  if (!expiraEn) return '';
-
-  const ahora = new Date();
-  const expira = new Date(expiraEn);
-  const diffMs = expira.getTime() - ahora.getTime();
-  const diffMins = Math.max(0, Math.floor(diffMs / 60000));
-
-  return `${diffMins} minutos`;
-};
-
-// Cargar horarios disponibles
-const cargarHorariosDisponibles = async (fecha: string) => {
+// Cargar TODAS las horas ocupadas (confirmadas + reservadas activas)
+const cargarHorariosOcupados = async (fecha: string) => {
   if (!fecha) {
-    horariosDisponibles.value = [];
+    horasOcupadas.value = [];
     return;
   }
 
   try {
     const ahora = new Date().toISOString();
 
-    const { data: reservasExistentes, error } = await supabase
+    // Consulta EXPLÍCITA: Dos condiciones separadas
+    const { data: reservasConfirmadas, error: error1 } = await supabase
       .from('reservas')
       .select('hora')
       .eq('fecha', fecha)
-      .or('estado.in.(pendiente,confirmada),and(estado.eq.temporal,expira_en.gt.' + ahora + ')');
+      .eq('estado', 'confirmada');
 
-    if (error) {
-      console.error('Error cargando horarios ocupados:', error);
+    const { data: reservasReservadas, error: error2 } = await supabase
+      .from('reservas')
+      .select('hora')
+      .eq('fecha', fecha)
+      .eq('estado', 'reservado')
+      .gt('expira_en', ahora);
+
+    if (error1 || error2) {
+      console.error('Error cargando horarios ocupados:', error1 || error2);
       return;
     }
 
-    const horasOcupadas = reservasExistentes?.map((r) => r.hora) || [];
-    horariosDisponibles.value = todosLosHorarios.filter((hora) => !horasOcupadas.includes(hora));
+    // Combinar y normalizar las horas
+    const todasReservas = [...(reservasConfirmadas || []), ...(reservasReservadas || [])];
+
+    horasOcupadas.value = todasReservas.map((r) => {
+      // Convertir "09:00:00" a "09:00"
+      const [hora, minuto] = r.hora.split(':');
+      return `${hora}:${minuto}`;
+    });
+
+    console.log('Horas ocupadas para', fecha, ':', horasOcupadas.value);
   } catch (error) {
-    console.error('Error cargando horarios:', error);
-    horariosDisponibles.value = [];
+    console.error('Error cargando horarios ocupados:', error);
+    horasOcupadas.value = [];
   }
 };
 
-// Reservar una hora
-const reservarHora = async (hora: string) => {
+// Verificar si una hora está en el carrito
+const estaEnCarrito = (hora: string) => {
+  return carrito.value.some(
+    (reserva) => reserva.fecha === fechaSeleccionada.value && reserva.hora === hora,
+  );
+};
+
+// Calcular tiempo restante para una reserva
+const tiempoRestante = (expira_en: string) => {
+  const ahora = new Date();
+  const expira = new Date(expira_en);
+  const diffMs = expira.getTime() - ahora.getTime();
+
+  if (diffMs <= 0) return 'Expirado';
+
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffSecs = Math.floor((diffMs % 60000) / 1000);
+
+  return `${diffMins}:${diffSecs.toString().padStart(2, '0')} minutos`;
+};
+
+// Agregar al carrito CON bloqueo en Supabase
+const agregarAlCarrito = async (hora: string) => {
   if (!user.value?.id || !fechaSeleccionada.value) return;
 
-  // Validación frontend
-  if (!horariosDisponibles.value.includes(hora)) {
-    alert('Este horario ya está reservado. Por favor, elige otro.');
+  // Verificación adicional por si acaso
+  if (horasOcupadas.value.includes(hora)) {
+    alert('Este horario ya no está disponible. Por favor, elige otro.');
+    await cargarHorariosOcupados(fechaSeleccionada.value);
     return;
   }
 
-  reservando.value = true;
   try {
     const expiraEn = new Date();
     expiraEn.setMinutes(expiraEn.getMinutes() + 15);
 
-    const { error } = await supabase.from('reservas').insert({
-      user_id: user.value.id,
-      fecha: fechaSeleccionada.value,
-      hora: hora,
-      estado: 'temporal',
-      expira_en: expiraEn.toISOString(),
-    });
+    const { data, error } = await supabase
+      .from('reservas')
+      .insert({
+        user_id: user.value.id,
+        fecha: fechaSeleccionada.value,
+        hora: hora,
+        estado: 'reservado',
+        expira_en: expiraEn.toISOString(),
+      })
+      .select();
 
     if (error) {
-      // Manejo específico de error de duplicado
       if (error.code === '23505') {
-        alert(
-          'Este horario acaba de ser reservado. Por favor, actualiza la página y elige otro horario.',
-        );
-        // Recargar horarios disponibles
-        await cargarHorariosDisponibles(fechaSeleccionada.value);
+        alert('Este horario acaba de ser reservado. Por favor, elige otro.');
+        await cargarHorariosOcupados(fechaSeleccionada.value);
         return;
       }
       throw error;
     }
 
-    alert('⏳ Reserva temporal creada. Tienes 15 minutos para confirmar.');
+    // Añadir al carrito local con ID y tiempo de expiración
+    carrito.value.push({
+      id: data[0]?.id,
+      fecha: fechaSeleccionada.value,
+      hora: hora,
+      expira_en: expiraEn.toISOString(),
+    });
 
-    // Actualizar UI inmediatamente
-    horariosDisponibles.value = horariosDisponibles.value.filter((h) => h !== hora);
-    await cargarReservasTemporales();
+    guardarCarrito();
+    await cargarHorariosOcupados(fechaSeleccionada.value);
+
+    // Iniciar temporizador individual para esta reserva
+    iniciarTemporizadorReserva();
   } catch (error) {
-    console.error('Error realizando reserva:', error);
-    alert('Error al realizar la reserva');
-  } finally {
-    reservando.value = false;
+    console.error('Error agregando al carrito:', error);
+    alert('Error al reservar el horario');
   }
 };
 
-// Confirmar reserva permanente
-const confirmarReserva = async (reservaId: string) => {
+// Quitar del carrito LIBERANDO la reserva en Supabase
+const quitarDelCarrito = async (index: number) => {
+  if (index < 0 || index >= carrito.value.length) return;
+
+  const reserva = carrito.value[index];
+
+  // Verificación adicional para TypeScript
+  if (!reserva) return;
+
   try {
-    const { error } = await supabase
-      .from('reservas')
-      .update({
-        estado: 'confirmada',
-        expira_en: null,
-      })
-      .eq('id', reservaId);
+    if (reserva.id) {
+      // Eliminar por ID (más eficiente)
+      const { error } = await supabase.from('reservas').delete().eq('id', reserva.id);
 
-    if (error) throw error;
+      if (error) throw error;
+    } else {
+      // Fallback por fecha/hora
+      const { error } = await supabase
+        .from('reservas')
+        .delete()
+        .eq('fecha', reserva.fecha)
+        .eq('hora', reserva.hora)
+        .eq('user_id', user.value?.id)
+        .eq('estado', 'reservado');
 
-    alert('✅ Reserva confirmada permanentemente');
-    await cargarMisReservas();
-    await cargarReservasTemporales();
-    if (fechaSeleccionada.value) {
-      await cargarHorariosDisponibles(fechaSeleccionada.value);
+      if (error) throw error;
     }
+
+    carrito.value.splice(index, 1);
+    guardarCarrito();
+
+    // Actualizar disponibilidad
+    await cargarHorariosOcupados(reserva.fecha);
   } catch (error) {
-    console.error('Error confirmando reserva:', error);
-    alert('Error al confirmar la reserva');
+    console.error('Error eliminando reserva:', error);
+    // Limpiar el carrito local aunque falle en Supabase
+    carrito.value.splice(index, 1);
+    guardarCarrito();
   }
 };
 
-// Verificar y limpiar reservas expiradas
-// Verificar y limpiar reservas expiradas - MEJORADA
+// Guardar carrito en localStorage
+const guardarCarrito = () => {
+  localStorage.setItem('carritoReservas', JSON.stringify(carrito.value));
+};
+
+// Cargar carrito desde localStorage
+const cargarCarrito = () => {
+  const carritoGuardado = localStorage.getItem('carritoReservas');
+  if (carritoGuardado) {
+    carrito.value = JSON.parse(carritoGuardado);
+  }
+};
+
+// Verificar y limpiar reservas expiradas (SOLO cuando sea necesario)
 const verificarReservasExpiradas = async () => {
   try {
     const ahora = new Date().toISOString();
+    const hoy = new Date().toISOString().split('T')[0];
 
-    const { data: expiradas, error: selectError } = await supabase
-      .from('reservas')
-      .select('*')
-      .lt('expira_en', ahora)
-      .eq('estado', 'temporal');
-
-    if (selectError) {
-      console.error('Error buscando reservas expiradas:', selectError);
-      return;
-    }
-
-    console.log('Reservas expiradas encontradas:', expiradas?.length);
-
-    const { error: deleteError } = await supabase
+    // Eliminar reservas RESERVADAS expiradas
+    const { error: errorReservadas } = await supabase
       .from('reservas')
       .delete()
-      .lt('expira_en', ahora)
-      .eq('estado', 'temporal');
+      .eq('estado', 'reservado')
+      .lt('expira_en', ahora);
 
-    if (deleteError) {
-      console.error('Error eliminando reservas expiradas:', deleteError);
-      return;
+    if (errorReservadas) {
+      console.error('Error eliminando reservas expiradas:', errorReservadas);
     }
 
-    console.log('Reservas expiradas eliminadas');
+    // Limpiar reservas de fechas pasadas
+    const { error: errorPasadas } = await supabase.from('reservas').delete().lt('fecha', hoy);
 
-    await Promise.all([
-      cargarReservasTemporales(),
-      fechaSeleccionada.value
-        ? cargarHorariosDisponibles(fechaSeleccionada.value)
-        : Promise.resolve(),
-    ]);
+    if (errorPasadas) {
+      console.error('Error eliminando reservas pasadas:', errorPasadas);
+    }
+
+    // Recargar datos después de limpiar
+    if (fechaSeleccionada.value) {
+      await cargarHorariosOcupados(fechaSeleccionada.value);
+    }
+    await cargarMisReservas();
+    cargarCarrito(); // Recargar carrito por si había expirados
   } catch (error) {
     console.error('Error en verificación de expirados:', error);
   }
 };
 
-// Iniciar temporizador
-const iniciarTemporizador = () => {
-  if (temporizador.value !== null) {
-    clearInterval(temporizador.value);
+// Temporizador individual para reservas en carrito
+const iniciarTemporizadorReserva = () => {
+  if (temporizadorReserva.value !== null) {
+    clearInterval(temporizadorReserva.value);
   }
 
-  temporizador.value = window.setInterval(() => {
-    void verificarReservasExpiradas();
-  }, 60000);
+  temporizadorReserva.value = window.setInterval(() => {
+    // Actualizar visualmente los contadores
+    carrito.value = [...carrito.value];
+
+    // Verificar si alguna reserva expiró y limpiar
+    const ahora = new Date();
+    const reservasExpiradas = carrito.value.filter(
+      (reserva) => reserva.expira_en && new Date(reserva.expira_en) < ahora,
+    );
+
+    if (reservasExpiradas.length > 0) {
+      // Limpiar reservas expiradas
+      void verificarReservasExpiradas();
+    }
+  }, 1000); // Actualizar cada segundo para el contador
 };
 
-// Cargar reservas temporales
-const cargarReservasTemporales = async () => {
-  if (!user.value?.id) {
-    reservasTemporales.value = [];
-    return;
-  }
-
-  try {
-    const { data, error } = await supabase
-      .from('reservas')
-      .select('*')
-      .eq('user_id', user.value.id)
-      .eq('estado', 'temporal')
-      .order('expira_en', { ascending: true });
-
-    if (error) throw error;
-    reservasTemporales.value = data || [];
-  } catch (error) {
-    console.error('Error cargando reservas temporales:', error);
-    reservasTemporales.value = [];
-  }
-};
-
-// Cargar mis reservas (excluyendo temporales)
+// Cargar mis reservas confirmadas
 const cargarMisReservas = async () => {
   if (!user.value?.id) {
     misReservas.value = [];
@@ -354,7 +409,7 @@ const cargarMisReservas = async () => {
       .from('reservas')
       .select('*')
       .eq('user_id', user.value.id)
-      .neq('estado', 'temporal')
+      .eq('estado', 'confirmada')
       .gte('fecha', new Date().toISOString().split('T')[0])
       .order('fecha', { ascending: true })
       .order('hora', { ascending: true });
@@ -377,7 +432,7 @@ const cancelarReserva = async (reservaId: string) => {
     misReservas.value = misReservas.value.filter((reserva) => reserva.id !== reservaId);
 
     if (fechaSeleccionada.value) {
-      await cargarHorariosDisponibles(fechaSeleccionada.value);
+      await cargarHorariosOcupados(fechaSeleccionada.value);
     }
 
     alert('Reserva eliminada correctamente');
@@ -389,27 +444,24 @@ const cancelarReserva = async (reservaId: string) => {
 
 // Cleanup
 onUnmounted(() => {
-  if (temporizador.value !== null) {
-    clearInterval(temporizador.value);
+  if (temporizadorReserva.value !== null) {
+    clearInterval(temporizadorReserva.value);
   }
 });
 
 // Watchers y lifecycle
 onMounted(async () => {
-  await verificarReservasExpiradas();
-
-  // cargar datos
-  await Promise.all([cargarMisReservas(), cargarReservasTemporales()]);
-
-  // Iniciar temporizador
-  iniciarTemporizador();
+  await verificarReservasExpiradas(); // Limpiar al cargar la página
+  cargarCarrito();
+  await cargarMisReservas();
+  iniciarTemporizadorReserva(); // Iniciar temporizador para contadores
 });
 
 watch(
   () => fechaSeleccionada.value,
   (nuevaFecha: string) => {
     if (nuevaFecha) {
-      void cargarHorariosDisponibles(nuevaFecha);
+      void cargarHorariosOcupados(nuevaFecha);
     }
   },
 );
