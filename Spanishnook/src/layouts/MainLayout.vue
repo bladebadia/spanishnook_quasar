@@ -3,6 +3,7 @@
     <q-header elevated>
       <q-bar class="">
         <q-space></q-space>
+
         <q-btn to="/AreaPersonal" v-if="user" flat dense class="text-white underline-btn q-mx-md"
           >Area Personal
         </q-btn>
@@ -11,6 +12,18 @@
         </q-btn>
         <q-btn to="/Acceder" v-if="!user" flat dense class="text-white underline-btn q-mx-md"
           >Acceder
+        </q-btn>
+        <q-btn
+          to="/CarritoCompra"
+          v-if="user"
+          flat
+          dense
+          class="text-white q-mx-md relative-position"
+          icon="shopping_cart"
+        >
+          <q-badge v-if="carritoCount > 0" color="red" floating rounded class="badge-notification">
+            {{ carritoCount }}
+          </q-badge>
         </q-btn>
         <q-separator size="180px" color="white" />
         <div class="row items-center q-gutter-sm" style="width: 100%; max-width: 250px">
@@ -263,7 +276,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
+import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+import { useI18n } from 'vue-i18n';
+import { useAuth } from 'src/stores/auth';
+
+const { user } = useAuth();
+const { locale } = useI18n();
 
 // Banner de cookies
 const showCookiesBanner = ref(false);
@@ -271,16 +290,51 @@ function aceptarCookies() {
   localStorage.setItem('cookies_accepted', 'true');
   showCookiesBanner.value = false;
 }
+
+// Contador del carrito
+const carritoCount = ref(0);
+
+// Cargar carrito desde localStorage
+const cargarCarrito = () => {
+  const carritoGuardado = localStorage.getItem('carritoReservas');
+  if (carritoGuardado) {
+    const carrito = JSON.parse(carritoGuardado);
+    carritoCount.value = carrito.length;
+  } else {
+    carritoCount.value = 0;
+  }
+};
+
+// Escuchar cambios en el localStorage (para actualizar en tiempo real)
+const setupCarritoListener = () => {
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'carritoReservas') {
+      cargarCarrito();
+    }
+  });
+};
+
+// Temporizador para verificar cambios (por si las páginas están en la misma pestaña)
+const temporizadorCarrito = ref<number | null>(null);
+
+const iniciarTemporizadorCarrito = () => {
+  temporizadorCarrito.value = window.setInterval(() => {
+    cargarCarrito();
+  }, 1000); // Verificar cada segundo
+};
+
 onMounted(() => {
   showCookiesBanner.value = localStorage.getItem('cookies_accepted') !== 'true';
+  cargarCarrito();
+  setupCarritoListener();
+  iniciarTemporizadorCarrito();
 });
-import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
-import { useI18n } from 'vue-i18n';
-import { useAuth } from 'src/stores/auth';
 
-const { user } = useAuth();
-const { locale } = useI18n();
-//import router from 'src/router';
+onUnmounted(() => {
+  if (temporizadorCarrito.value !== null) {
+    clearInterval(temporizadorCarrito.value);
+  }
+});
 
 const langOptions = [
   { label: 'Español', value: 'es' },
@@ -381,5 +435,19 @@ function toggleLeftDrawer() {
 }
 .q-tab:hover {
   font-size: 1.6rem !important;
+}
+
+/* Estilos para la notificación del carrito */
+.badge-notification {
+  font-size: 10px;
+  padding: 2px 5px;
+  min-width: 16px;
+  height: 16px;
+  top: -4px;
+  right: -4px;
+}
+
+.relative-position {
+  position: relative;
 }
 </style>

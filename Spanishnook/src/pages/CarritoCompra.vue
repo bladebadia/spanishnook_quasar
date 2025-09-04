@@ -5,7 +5,7 @@
     <div v-if="carrito.length === 0" class="text-center q-mt-xl">
       <q-icon name="shopping_cart" size="100px" color="grey-4" />
       <p class="text-grey q-mt-md">Tu carrito está vacío</p>
-      <q-btn color="primary" label="Volver a Reservas" to="/reserva" class="q-mt-md" />
+      <q-btn color="primary" label="Volver a Reservas" to="/HorarioReserva" class="q-mt-md" />
     </div>
 
     <div v-else>
