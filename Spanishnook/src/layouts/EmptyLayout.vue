@@ -1,8 +1,9 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lHh Lpr fff">
     <q-header elevated>
       <q-bar class="">
         <q-space></q-space>
+
         <q-btn to="/AreaPersonal" v-if="user" flat dense class="text-white underline-btn q-mx-md"
           >Area Personal
         </q-btn>
@@ -11,6 +12,18 @@
         </q-btn>
         <q-btn to="/Acceder" v-if="!user" flat dense class="text-white underline-btn q-mx-md"
           >Acceder
+        </q-btn>
+        <q-btn
+          to="/CarritoCompra"
+          v-if="user"
+          flat
+          dense
+          class="text-white q-mx-md relative-position"
+          icon="shopping_cart"
+        >
+          <q-badge v-if="carritoCount > 0" color="red" floating rounded class="badge-notification">
+            {{ carritoCount }}
+          </q-badge>
         </q-btn>
         <q-separator size="180px" color="white" />
         <div class="row items-center q-gutter-sm" style="width: 100%; max-width: 250px">
@@ -42,7 +55,8 @@
         />
 
         <img
-          src="/img/logoiso_320.png"
+          round
+          src="/img/Logotexto_500.png"
           alt="Logo Spanish nook"
           style="
             height: 50px;
@@ -56,8 +70,13 @@
           class="q-mr-md"
         />
         <q-toolbar-title> Spanish nook </q-toolbar-title>
-        <q-tabs class="justify-center q-m-lg" shrink stretch v-if="$q.screen.gt.sm">
-          <q-route-tab to="/IndexPage" name="tab1" Class="q-tab">Inicio</q-route-tab>
+        <q-tabs
+          class="flex flex-justify justify-center align-justify q-m-lg"
+          shrink
+          stretch
+          v-if="$q.screen.gt.sm"
+        >
+          <q-route-tab to="/" name="tab1" Class="q-tab">Inicio</q-route-tab>
           <q-route-tab to="/sobreSpanish" name="tab5" Class="q-tab">Sobre Spanish Nook</q-route-tab>
           <q-btn-dropdown auto-close stretch flat class="q-tab q-pb-sm" label="Clases">
             <q-list>
@@ -72,47 +91,13 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-route-tab to="/TestNivel" name="tab3" class="q-mx-md q-tab">Test de nivel</q-route-tab>
-          <q-route-tab to="/Contacto" name="tab4" class="q-mx-md q-tab">Contacto</q-route-tab>
+          <q-route-tab to="/TestNivel" name="tab3" class="q-tab">Test de nivel</q-route-tab>
+          <q-route-tab to="/Contacto" name="tab4" class="q-tab">Contacto</q-route-tab>
         </q-tabs>
         <q-space v-if="$q.screen.gt.sm" />
-        <q-btn
-          icon="mdi-facebook"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-ml-md"
-          href="@paulafromthenook"
-        />
-        <q-btn
-          icon="mdi-instagram"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-mr-lg q-pr-lg"
-          href="@paulaspanishnook"
-        />
-        <q-btn
-          icon="mdi-whatsapp"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-mr-lg q-pr-lg"
-          href="@paulaspanishnook"
-        />
-        <q-btn
-          icon="mdi-youtube"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-mr-lg q-pr-lg"
-          href="@paulaspanishnook"
-        />
-        <q-btn
-          icon="mdi-mail"
-          size="lg"
-          flat
-          class="text-white underline-btn q-sm-mr-lg q-pr-lg"
-          href="@paulaspanishnook"
-        />
       </q-toolbar>
     </q-header>
+    <!-- El sticky debe ir fuera de <q-page-container> y antes del footer -->
 
     <q-drawer v-model="leftDrawerOpen" bordered>
       <q-list>
@@ -122,21 +107,142 @@
     </q-drawer>
 
     <q-page-container>
+      <q-banner
+        v-if="showCookiesBanner"
+        class="bg-primary text-white shadow-2 cookies-banner"
+        style="
+          position: fixed;
+          left: 50%;
+          bottom: 96px;
+          transform: translateX(-50%);
+          width: 70vw;
+          max-width: 900px;
+          z-index: 9999;
+          font-size: 1.25rem;
+          border-radius: 18px;
+          padding: 24px 32px;
+        "
+        icon="cookie"
+      >
+        <div class="row items-center justify-between">
+          <div style="line-height: 1.5">
+            Este sitio web utiliza cookies propias y de terceros para mejorar la experiencia de
+            usuario y analizar el tráfico. Si continúas navegando, consideramos que aceptas su uso.
+            <q-btn
+              flat
+              dense
+              color="white"
+              label="Política de Cookies"
+              to="/Cookies"
+              class="q-ml-sm"
+            />
+          </div>
+          <q-btn
+            color="white"
+            text-color="primary"
+            label="Aceptar"
+            @click="aceptarCookies"
+            class="q-ml-md text-weight-bold"
+            style="font-size: 1.1rem; padding: 8px 24px; border-radius: 8px"
+          />
+        </div>
+      </q-banner>
       <router-view />
     </q-page-container>
 
-    <!-- ❌ NO incluir el footer aquí -->
+    <q-page-sticky position="bottom-right" :offset="[10, 10]">
+      <q-btn
+        class="whatsapp-sticky-btn enlarged-touch"
+        round
+        color="green-6"
+        icon="mdi-whatsapp"
+        size="xl"
+        href="https://wa.me/34600000000"
+        target="_blank"
+        rel="noopener"
+        aria-label="WhatsApp"
+      />
+    </q-page-sticky>
+    <q-footer class="bg-black text-white">
+      <q-bar class="footer-bar">
+        <div class="row flex items-center full-width">
+          <div class="q-mr-lg">© 2025 Spanishnook · Todos los derechos reservados</div>
+          <router-link to="/Aviso" class="q-px-md q-mx-md text-white">Aviso Legal</router-link>
+          <router-link to="/Privacidad" class="q-px-md q-mx-md text-white"
+            >Política de Privacidad</router-link
+          >
+          <router-link to="/Cookies" class="q-px-md q-mx-md text-white"
+            >Política de Cookies</router-link
+          >
+          <router-link to="/Condiciones" class="q-px-md q-mx-md text-white"
+            >Condiciones de Venta</router-link
+          >
+        </div>
+      </q-bar>
+    </q-footer>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
 import { useI18n } from 'vue-i18n';
 import { useAuth } from 'src/stores/auth';
 
 const { user } = useAuth();
 const { locale } = useI18n();
+
+// Banner de cookies
+const showCookiesBanner = ref(false);
+function aceptarCookies() {
+  localStorage.setItem('cookies_accepted', 'true');
+  showCookiesBanner.value = false;
+}
+
+// Contador del carrito
+const carritoCount = ref(0);
+
+// Cargar carrito desde localStorage
+const cargarCarrito = () => {
+  const carritoGuardado = localStorage.getItem('carritoReservas');
+  if (carritoGuardado) {
+    const carrito = JSON.parse(carritoGuardado);
+    carritoCount.value = carrito.length;
+  } else {
+    carritoCount.value = 0;
+  }
+};
+
+// Escuchar cambios en el localStorage (para actualizar en tiempo real)
+const setupCarritoListener = () => {
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'carritoReservas') {
+      cargarCarrito();
+    }
+  });
+};
+
+// Temporizador para verificar cambios (por si las páginas están en la misma pestaña)
+const temporizadorCarrito = ref<number | null>(null);
+
+const iniciarTemporizadorCarrito = () => {
+  temporizadorCarrito.value = window.setInterval(() => {
+    cargarCarrito();
+  }, 1000); // Verificar cada segundo
+};
+
+onMounted(() => {
+  showCookiesBanner.value = localStorage.getItem('cookies_accepted') !== 'true';
+  cargarCarrito();
+  setupCarritoListener();
+  iniciarTemporizadorCarrito();
+});
+
+onUnmounted(() => {
+  if (temporizadorCarrito.value !== null) {
+    clearInterval(temporizadorCarrito.value);
+  }
+});
 
 const langOptions = [
   { label: 'Español', value: 'es' },
@@ -197,6 +303,37 @@ function toggleLeftDrawer() {
   text-decoration: underline;
 }
 
+.img-responsiva {
+  width: 100%;
+  height: auto;
+  max-width: 200px;
+  max-height: 200px;
+}
+.footer-link {
+  color: white !important;
+  font-weight: bold;
+  text-decoration: none !important;
+  display: inline-block;
+}
+.footer-link:hover {
+  color: #de1212 !important;
+  transform: translateX(8px);
+}
+
+.footer-bar {
+  min-height: 48px;
+  font-size: 1.1rem;
+}
+
+.whatsapp-sticky-btn {
+  .enlarged-touch {
+    min-width: 72px;
+    min-height: 72px;
+    padding: 12px !important;
+    box-sizing: content-box;
+  }
+}
+
 .q-tab {
   font-size: 1.3rem !important;
   font-weight: medium !important;
@@ -206,5 +343,19 @@ function toggleLeftDrawer() {
 }
 .q-tab:hover {
   font-size: 1.6rem !important;
+}
+
+/* Estilos para la notificación del carrito */
+.badge-notification {
+  font-size: 10px;
+  padding: 2px 5px;
+  min-width: 16px;
+  height: 16px;
+  top: -4px;
+  right: -4px;
+}
+
+.relative-position {
+  position: relative;
 }
 </style>

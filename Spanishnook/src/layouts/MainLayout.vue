@@ -76,7 +76,7 @@
           stretch
           v-if="$q.screen.gt.sm"
         >
-          <q-route-tab to="/IndexPage" name="tab1" Class="q-tab">Inicio</q-route-tab>
+          <q-route-tab to="/" name="tab1" Class="q-tab">Inicio</q-route-tab>
           <q-route-tab to="/sobreSpanish" name="tab5" Class="q-tab">Sobre Spanish Nook</q-route-tab>
           <q-btn-dropdown auto-close stretch flat class="q-tab q-pb-sm" label="Clases">
             <q-list>
@@ -349,7 +349,7 @@ const linksList: EssentialLinkProps[] = [
   {
     title: 'Home',
     icon: 'school',
-    link: '/IndexPage',
+    link: '/',
   },
   {
     title: 'Test de nivel',

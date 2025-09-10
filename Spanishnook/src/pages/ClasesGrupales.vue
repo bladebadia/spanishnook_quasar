@@ -35,6 +35,16 @@
             Empieza ahora
           </q-btn>
         </div>
+    <!-- Imagen animada de izquierda a derecha -->
+      <div v-if="showAnimatedImg" class="row q-mb-xl " style="width: 100%; position: relative; min-height: 300px;">
+        <img
+          src="/img/corazon.png"
+          alt="Estudiantes"
+          class="img-animada move-lr"
+          style="max-width: 300px; width: 100%; position: absolute; left: 0; top: 0; margin: 0; padding: 0;"
+        />
+        
+      </div>
   </q-img>
   <div>
     <h2 class="text-h2 q-my-lg">Clases Grupales</h2>
@@ -45,13 +55,20 @@
     <!-- Imagen animada de izquierda a derecha -->
   <div v-intersect="onImgIntersect" style="width: 100%;" class="row q-mb-xl full-width">
     <transition name="slide-fade-left">
-      <div v-if="showAnimatedImg" class="row q-mb-xl " style="width: 100%; position: relative; min-height: 300px;">
+      <div v-if="showAnimatedImg" class="row q-my-xl q-py-xl" style="width: 100%; position: relative; min-height: 300px;">
         <img
-          src="/img/corazon.png"
+          src="/img/animacion4.png"
           alt="Estudiantes"
           class="img-animada move-lr"
           style="max-width: 300px; width: 100%; position: absolute; left: 0; top: 0; margin: 0; padding: 0;"
-        />
+          @animationend="mostrarBocadillo = true"
+          />
+        <transition name="fade">
+          <div v-if="mostrarBocadillo" class="bocadillo-texto">
+            ¡Bienvenid@ a
+            <br/>Spanish Nook!
+          </div>
+        </transition>
       </div>
     </transition>
   </div>
@@ -82,29 +99,36 @@
     </div>
   </div>
 
+
   <!-- div de servicio clases grupales -->
   <div class="servicio-clases-grupales">
     <div class="row flex q-my-xl" style="width: 100%; gap: 32px;">
-      <div class="col-12 col-md-5">
-          <q-card class="q-pa-xl shadow-2 bg-white text-primary text-center">
-            <h2 class="text-h4 q-mb-md">Cursos </h2>
+      <div class="col-12 flex flex-center" >
+          <q-card  class="q-pa-xl shadow-2 bg-white text-dark "
+            style="width: 80%;">
+            <div class="text-h3 q-mb-md text-center">Nuestro grupos formativos</div>
+            <p class="q-mb-none text-center text-h5">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo quod deserunt atque unde ipsam laboriosam aspernatur nihil? Dolores unde necessitatibus ipsa qui ab perspiciatis dolore sequi! Laboriosam quidem nobis distinctio.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, neque. Iste, quia suscipit. Porro rerum nam non repudiandae saepe harum similique excepturi quibusdam, modi sunt voluptatum, quasi officiis eum quidem?
+            </p>
+          </q-card>
+          
+      </div>
+      <div class="col-12 col-md-6 flex flex-center" >
+          <q-card class="q-pa-xl shadow-2 bg-white text-primary text-center"
+            style="width: 80%;">
+            <h2 class="text-h4 q-mb-md">Selecciona tu curso </h2>
             <q-select
               v-model="cursoSeleccionado"
               :options="cursos"
               label="Selecciona un curso"
               outlined
-              dense
+              
               class="q-mb-md"
             />
           </q-card>
       </div>
-      <div class="col-12 col-md-5">
-          <q-card  class="q-pa-xl shadow-2 bg-white text-dark">
-            <div class="text-h5 q-mb-md">Nuestro grupos formativos</div>
-            <p class="q-mb-none">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Distinctio pariatur ab reprehenderit nisi sunt ipsam odit amet dicta at doloremque harum praesentium quos aliquam ipsum, itaque rem nesciunt. Reiciendis, similique?</p>
-          </q-card>
-          
-      </div>
+      
     </div>
     <div class="flex flex-center">
       <q-card v-if="cursoSeleccionado" class="q-pa-xl shadow-2 bg-white text-dark">
@@ -127,48 +151,64 @@
 
 <script setup lang="ts">
 
-  import type { Ref } from 'vue';
-  import { ref, onMounted, onUnmounted } from 'vue';
-    // Cursos para el selector
-    const cursos = [
-      { coste : 230 ,label: 'A1 (A1.1/A1.2)', value: 'A1', descripcion: 'Mejora tu fluidez y confianza hablando en grupo sobre temas cotidianos y de actualidad.' },
-      { coste : 230 ,label: 'A2 (A2.1/A2.2)', value: 'A2', descripcion: 'Mejora tu fluidez y confianza hablando en grupo sobre temas cotidianos y de actualidad.' },
-      { coste : 230 ,label: 'B1 (B1.1/B1.2)', value: 'B1', descripcion: 'Mejora tu fluidez y confianza hablando en grupo sobre temas cotidianos y de actualidad.' },
-      { coste : 230 ,label: 'B2 ', value: 'B2', descripcion: 'Mejora tu fluidez y confianza hablando en grupo sobre temas cotidianos y de actualidad.' },
-      { coste : 230 ,label: 'C1', value: 'C1', descripcion: 'Mejora tu fluidez y confianza hablando en grupo sobre temas cotidianos y de actualidad.' },
-      { coste : 230 ,label: 'Conversación', value: 'conversacion', descripcion: 'Mejora tu fluidez y confianza hablando en grupo sobre temas cotidianos y de actualidad.' },
-      { coste : 230 ,label: 'Gramática', value: 'gramatica', descripcion: 'Refuerza las bases gramaticales del español con ejercicios prácticos y explicaciones claras.' },
-      { coste : 230 ,label: 'Preparación DELE', value: 'dele', descripcion: 'Prepárate para los exámenes oficiales DELE con simulacros y estrategias específicas.' },
-      { coste : 230 ,label: 'Cultura y Sociedad', value: 'cultura', descripcion: 'Descubre la cultura hispana a través de actividades, debates y recursos auténticos.' }
-    ];
-    const cursoSeleccionado = ref(null);
-  const showAnimatedImg = ref(false);
-  let lastScrollY = window.scrollY;
-  let scrollDirection: 'down' | 'up' = 'down';
+import { ref, onMounted } from 'vue';
+import type { Ref } from 'vue';
+import { supabase } from 'src/supabaseClient';
 
+  // Cursos para el selector
+    const cursos = ref<Curso[]>([]);
+    const cursoSeleccionado = ref(null);
+    const mostrarBocadillo = ref(false);
+    const showAnimatedImg = ref(false);
+
+    interface Curso {
+      // define aquí los campos, por ejemplo:
+      id: number;
+      created_at: string;// pasar a Date si es necesario
+      codigo_curso: string;      
+      nombre_curso: string;
+      estado_curso: string;
+      fecha_inicio: string; // pasar a Date si es necesario
+      fecha_fin: string; // pasar a Date si es necesario
+      horarios_curso: string;
+      precio_curso: number;
+      usuario_1: string;
+      usuario_2: string;
+      usuario_3: string;
+      usuario_4: string;
+      usuario_5: string;
+      usuario_6: string;
+      usuario_7: string;
+      usuario_8: string;
+      moneda: string;
+      descripcion: string;
+
+      // ...
+    }
+
+onMounted(async () => {
+  const { data, error } = await supabase.from('cursos_grupales').select('*');
+  if (!error) {
+    cursos.value = data;
+    console.log(data);
+  }else {console.log(error);}
+});
+
+  let animacionMostrada = false;
 
   function onImgIntersect(entry: IntersectionObserverEntry) {
-    if (entry.isIntersecting && scrollDirection === 'down') {
+    if (entry.isIntersecting && !animacionMostrada) {
       showAnimatedImg.value = false;
       setTimeout(() => {
         showAnimatedImg.value = true;
+        animacionMostrada = true;
       }, 10);
     }
-    if (!entry.isIntersecting) {
-      showAnimatedImg.value = false;
-    }
+    // No ocultar la animación ni el bocadillo al salir del viewport
     return true;
   }
 
-  function handleScroll() {
-  const currentY = window.scrollY;
-  scrollDirection = currentY > lastScrollY ? 'down' : 'up';
-  lastScrollY = currentY;
-}
-
-  onMounted(() => {
-    window.addEventListener('scroll', handleScroll);
-  });
+;
 
     // Animación de conteo ascendente para los números
     const count1 = ref(0);
@@ -209,14 +249,6 @@
         count4.value = 0;
       }
     }
-
-    onMounted(() => {
-      window.addEventListener('scroll', handleScroll);
-    });
-
-  onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll);
-  });
 
 
 </script>
@@ -310,6 +342,56 @@
   color: #444;
   text-align: center;
 }
+  .bocadillo-texto {
+    position: absolute;
+    right: 600px;
+    top: 40px;
+    background: #f9f9f8;
+    border-radius: 50% 50% 60% 60% / 60% 60% 50% 50%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07), 0 0 0 8px #e0e7ff inset;
+    padding: 28px 38px 24px 38px;
+    font-size: 1.2rem;
+    color: #333333;
+    min-width: 180px;
+    z-index: 10;
+    border: 2px solid #2f06e4;
+    transform: rotate(-30deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    box-sizing: border-box;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.10));
+  }
+  .bocadillo-texto::after, .bocadillo-texto::before {
+    content: '';
+    position: absolute;
+    background: #f9f9f8;
+    border: 2px solid #2f06e4;
+    z-index: 9;
+  }
+  .bocadillo-texto::after {
+    width: 38px;
+    height: 38px;
+    left: 80%;
+    top: 80%;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .bocadillo-texto::before {
+    width: 22px;
+    height: 22px;
+    left: 95%;
+    top: 95%;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s;
+  }
+  .fade-enter-from, .fade-leave-to {
+    opacity: 0;
+  }
 </style>
 
 
