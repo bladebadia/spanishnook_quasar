@@ -51,6 +51,34 @@
 }
 
 @font-face {
+  font-family: 'Montserrat-regular';
+  src: url('fonts/Montserrat-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-display: swap;
+}
+.Montserrat-regular {
+  font-family: 'Montserrat-Regular', sans-serif;
+}
+
+@font-face {
+  font-family: 'Montserrat-thin';
+  src: url('fonts/Montserrat-Thin.ttf') format('truetype');
+  font-style: normal;
+  font-display: swap;
+}
+.Montserrat-thin {
+  font-family: 'Montserrat-Thin', sans-serif;
+}
+@font-face {
+  font-family: 'Montserrat-Light';
+  src: url('fonts/Montserrat-Light.ttf') format('truetype');
+  font-style: normal;
+  font-display: swap;
+}
+.Montserrat-light {
+  font-family: 'Montserrat-Light', sans-serif;
+}
+@font-face {
   font-family: 'Anton';
   src: url('fonts/Anton-Regular.ttf') format('truetype');
   font-style: normal;
@@ -79,5 +107,15 @@ h4 {
   font-family: 'Montserrat-Medium';
 }
 h5 {
+  font-family: 'Montserrat-regular';
+}
+h6 {
   font-family: 'Anton';
+}
+h7 {
+  font-family: 'Montserrat-thin';
+}
+
+h8 {
+  font-family: 'Montserrat-light';
 }
