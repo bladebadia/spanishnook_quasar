@@ -42,6 +42,26 @@
       </q-btn>
     </div>
 
+    <div v-intersect="onImgIntersect" style="width: 100%;" class="row q-mb-xl full-width">
+    <transition name="slide-fade-left">
+      <div v-if="showAnimatedImg" class="row q-my-xl q-py-xl" style="width: 100%; position: relative; min-height: 300px;">
+        <img
+          src="/img/animacion1.png"
+          alt="Estudiantes"
+          class="img-animada move-lr"
+          style="max-width: 300px; width: 100%; position: absolute; left: 0; top: 0; margin: 0; padding: 0;"
+          @animationend="mostrarBocadillo = true"
+          />
+        <transition name="fade">
+          <div v-if="mostrarBocadillo" class="bocadillo-texto">
+            ¡Bienvenid@ a
+            <br/>Spanish Nook!
+          </div>
+        </transition>
+      </div>
+    </transition>
+  </div>
+
     <!-- Card promocional que aparece al hacer scroll -->
     <div
       v-intersect="onPromoIntersect"
@@ -51,7 +71,7 @@
       <transition enter-active-class="animated fadeInUpBig slower ">
         <div v-if="showPromoCard" class="row" style="width: 100%">
           <div class="col-12 col-md-6 items-center flex flex-center">
-            <q-card class="q-pa-lg" style="max-width: 650px; width: 100%">
+            <q-card class="q-pa-lg" style="max-width: 600px; width: 100%">
               <img src="img/estudiante_1024.jpg" />
               <q-card-section class="text-h4 text-center"
                 >¡Descubre nuestras clases!</q-card-section
@@ -362,53 +382,60 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref } from 'vue';
 
 const showPromoCard = ref(false);
 const showPromoCard1 = ref(false);
 const showPromoCard2 = ref(false);
+
 const showPromoCard4 = ref(false);
+const mostrarBocadillo = ref(false);
+const showAnimatedImg = ref(false);
 
-let lastScrollY = window.scrollY;
-let scrollDirection: 'down' | 'up' = 'down';
+// Solo mostrar la animación una vez por sesión
 
-function handleScroll() {
-  const currentY = window.scrollY;
-  scrollDirection = currentY > lastScrollY ? 'down' : 'up';
-  lastScrollY = currentY;
-}
 
-onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
-});
 
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
-});
+
+
+  let animacionMostrada = false;
+  function onImgIntersect(entry: IntersectionObserverEntry) {
+    if (entry.isIntersecting && !animacionMostrada) {
+      showAnimatedImg.value = false;
+      setTimeout(() => {
+        showAnimatedImg.value = true;
+        animacionMostrada = true;
+      }, 10);
+    }
+    // No ocultar la animación ni el bocadillo al salir del viewport
+    return true;
+  }
+
+
 
 function onPromoIntersect(entry: IntersectionObserverEntry): boolean {
-  if (entry.isIntersecting && scrollDirection === 'down') {
+  if (entry.isIntersecting) {
     showPromoCard.value = true;
   }
   return true;
 }
 
 function onPromoIntersect1(entry: IntersectionObserverEntry): boolean {
-  if (entry.isIntersecting && scrollDirection === 'down') {
+  if (entry.isIntersecting ) {
     showPromoCard1.value = true;
   }
   return true;
 }
 
 function onPromoIntersect2(entry: IntersectionObserverEntry): boolean {
-  if (entry.isIntersecting && scrollDirection === 'down') {
+  if (entry.isIntersecting ) {
     showPromoCard2.value = true;
   }
   return true;
 }
 
 function onPromoIntersect4(entry: IntersectionObserverEntry): boolean {
-  if (entry.isIntersecting && scrollDirection === 'down') {
+  if (entry.isIntersecting) {
     showPromoCard4.value = true;
   }
   return true;
@@ -542,4 +569,84 @@ function onPromoIntersect4(entry: IntersectionObserverEntry): boolean {
 .faqs-section ::v-deep .q-expansion-item__toggle-icon {
   font-size: 2.5rem !important;
 }
+
+/* Animación de entrada izquierda a derecha */
+.slide-fade-left-enter-active {
+  /* No usar para la traslación, solo para fade si se desea */
+}
+.slide-fade-left-leave-active {
+  display: none;
+}
+.move-lr {
+  animation: moveLeftToRight 1s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes moveLeftToRight {
+  0% {
+    opacity: 0;
+    left: 0;
+    transform: translateX(0);
+  }
+  20% {
+    opacity: 0;
+    left: 0;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 1;
+    left: 80%;
+    transform: translateX(-100%);
+  }
+}
+
+.bocadillo-texto {
+    position: absolute;
+    right: 600px;
+    top: 40px;
+    background: #f9f9f8;
+    border-radius: 50% 50% 60% 60% / 60% 60% 50% 50%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07), 0 0 0 8px #e0e7ff inset;
+    padding: 28px 38px 24px 38px;
+    font-size: 1.2rem;
+    color: #333333;
+    min-width: 180px;
+    z-index: 10;
+    border: 2px solid #2f06e4;
+    transform: rotate(-30deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    box-sizing: border-box;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.10));
+  }
+  .bocadillo-texto::after, .bocadillo-texto::before {
+    content: '';
+    position: absolute;
+    background: #f9f9f8;
+    border: 2px solid #2f06e4;
+    z-index: 9;
+  }
+  .bocadillo-texto::after {
+    width: 38px;
+    height: 38px;
+    left: 80%;
+    top: 80%;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .bocadillo-texto::before {
+    width: 22px;
+    height: 22px;
+    left: 95%;
+    top: 95%;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s;
+  }
+  .fade-enter-from, .fade-leave-to {
+    opacity: 0;
+  }
 </style>

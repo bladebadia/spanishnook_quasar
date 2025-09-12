@@ -4,49 +4,116 @@ import { useAuth } from 'src/stores/auth';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/IndexPage.vue') },
-      { path: '/IndexPage', component: () => import('pages/IndexPage.vue') },
-      {
-        path: '/AreaPersonal',
-        component: () => import('pages/AreaPersonal.vue'),
-        beforeEnter: () => {
-          const { user } = useAuth();
-          if (!user.value) {
-            return '/Acceder';
-          }
-        },
-      },
-      { path: '/TestNivel', component: () => import('pages/TestNivel.vue') },
-      { path: '/ClasesGrupales', component: () => import('pages/ClasesGrupales.vue') },
-      { path: '/ClasesIndividuales', component: () => import('pages/ClasesIndividuales.vue') },
-      { path: '/Contacto', component: () => import('pages/ContactoForm.vue') },
-      { path: '/EjerciciosEspañol', component: () => import('pages/EjerciciosEspañol.vue') },
-      { path: '/ServiciosNook', component: () => import('pages/ServiciosNook.vue') },
-      { path: '/SobreSpanish', component: () => import('pages/SobreSpanish.vue') },
-      { path: '/Acceder', component: () => import('pages/Acceder.vue') },
-      { path: '/Registro', component: () => import('pages/Registro.vue') },
-      { path: '/AuthCallback', component: () => import('pages/AuthCallback.vue') },
-      { path: '/Cookies', component: () => import('pages/legalCookies.vue') },
-      { path: '/Privacidad', component: () => import('pages/legalPrivacidad.vue') },
-      { path: '/Aviso', component: () => import('pages/legalAviso.vue') },
-      { path: '/Condiciones', component: () => import('pages/legalCondicionesVenta.vue') },
-      { path: '/HorarioReserva', component: () => import('pages/HorarioReserva.vue') },
-      { path: '/ResetPassword', component: () => import('pages/ResetPassword.vue') },
-      { path: '/CarritoCompra', component: () => import('pages/CarritoCompra.vue') },
-    ],
+    component: () => import('pages/IndexPage.vue'),
+    meta: { requiresAuth: false, layout: 'Main' },
+  },
+  {
+    path: '/AreaPersonal',
+    component: () => import('pages/AreaPersonal.vue'),
+    beforeEnter: () => {
+      const { user } = useAuth();
+      if (!user.value) {
+        return '/Acceder';
+      }
+    },
+    meta: { requiresAuth: true, layout: 'empty' },
+  },
+  {
+    path: '/ClasesGrupales',
+    component: () => import('pages/ClasesGrupales.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/ClasesIndividuales',
+    component: () => import('pages/ClasesIndividuales.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/Contacto',
+    component: () => import('pages/ContactoForm.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/EjerciciosEspañol',
+    component: () => import('pages/EjerciciosEspañol.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/ServiciosNook',
+    component: () => import('pages/ServiciosNook.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/SobreSpanish',
+    component: () => import('pages/SobreSpanish.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/Acceder',
+    component: () => import('pages/Acceder.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/Registro',
+    component: () => import('pages/Registro.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/AuthCallback',
+    component: () => import('pages/AuthCallback.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/Cookies',
+    component: () => import('pages/legalCookies.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/Privacidad',
+    component: () => import('pages/legalPrivacidad.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/Aviso',
+    component: () => import('pages/legalAviso.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/Condiciones',
+    component: () => import('pages/legalCondicionesVenta.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/HorarioReserva',
+    component: () => import('pages/HorarioReserva.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/ResetPassword',
+    component: () => import('pages/ResetPassword.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+  {
+    path: '/CarritoCompra',
+    component: () => import('pages/CarritoCompra.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
   },
   {
     path: '/CheckEmail',
-    component: () => import('src/layouts/EmptyLayout.vue'),
-    children: [{ path: '', component: () => import('pages/CheckEmail.vue') }],
+    component: () => import('pages/CheckEmail.vue'),
+    meta: { layout: 'empty' },
+  },
+  {
+    path: '/TestNivel',
+    component: () => import('pages/TestNivel.vue'),
+    meta: { layout: 'empty' },
   },
   // Always leave this as last one,
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue'),
+    meta: { layout: 'empty' },
   },
 ];
 
