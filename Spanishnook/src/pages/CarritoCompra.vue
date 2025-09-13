@@ -9,25 +9,47 @@
     </div>
 
     <div v-else>
+      <!-- Lista de reservas en carrito -->
       <q-list bordered class="q-mb-lg">
-        <q-item v-for="(reserva, index) in carrito" :key="index" class="q-mb-sm">
+        <q-item
+          v-for="(reserva, index) in carrito"
+          :key="index"
+          class="q-mb-sm"
+          :class="{ 'bg-negative-1': esReservaConflictiva(reserva) }"
+        >
           <q-item-section>
-            <q-item-label class="text-h6">
+            <q-item-label class="text-h6" :class="{ 'text-white': esReservaConflictiva(reserva) }">
               {{ formatFecha(reserva.fecha) }} a las {{ reserva.hora }}
             </q-item-label>
-            <q-item-label caption v-if="reserva.expira_en">
-              ⏳ Expira en: {{ tiempoRestante(reserva.expira_en) }}
-            </q-item-label>
-            <q-item-label caption v-else class="text-negative">
-              ⚠️ Tiempo de reserva no disponible
+            <q-item-label v-if="esReservaConflictiva(reserva)" class="text-white">
+              ⚠️ Esta hora ya está ocupada
             </q-item-label>
           </q-item-section>
 
           <q-item-section side>
-            <q-btn color="negative" icon="delete" @click="quitarDelCarrito(index)" round flat />
+            <q-btn
+              color="negative"
+              icon="delete"
+              @click="quitarDelCarrito(index)"
+              round
+              flat
+              :class="{ 'text-white': esReservaConflictiva(reserva) }"
+            />
           </q-item-section>
         </q-item>
       </q-list>
+
+      <!-- Resumen del pedido -->
+      <div class="bg-grey-2 q-pa-md rounded-borders q-mb-lg">
+        <h6>Resumen del Pedido</h6>
+        <div class="row justify-between items-center">
+          <span>{{ carrito.length }} reserva(s)</span>
+          <span class="text-h6 text-primary">Total: {{ total }}€</span>
+        </div>
+        <div v-if="reservasConflictivas.length > 0" class="text-negative q-mt-sm">
+          ⚠️ {{ reservasConflictivas.length }} reserva(s) no disponible(s)
+        </div>
+      </div>
 
       <!-- Botones de acción -->
       <div class="row q-gutter-md justify-end">
@@ -36,20 +58,21 @@
           color="primary"
           label="Confirmar Reservas"
           @click="confirmarReservas"
-          :disabled="hayReservasExpiradas"
+          :disabled="!usuarioLogueado || reservasConflictivas.length > 0"
+          :loading="confirmando"
         />
       </div>
 
-      <!-- Alerta de reservas expiradas -->
-      <q-banner v-if="hayReservasExpiradas" class="bg-negative text-white q-mt-md">
-        ⚠️ Tienres reservas que han expirado. Por favor, elimínalas y vuelve a reservar.
+      <!-- Mensajes informativos -->
+      <q-banner v-if="!usuarioLogueado" class="bg-warning text-dark q-mt-md">
+        ⚠️ Debes iniciar sesión para confirmar reservas
       </q-banner>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { supabase } from 'src/supabaseClient';
 import { useAuth } from 'src/stores/auth';
@@ -58,14 +81,24 @@ const { user } = useAuth();
 const router = useRouter();
 
 interface ReservaCarrito {
-  id?: string;
   fecha: string;
   hora: string;
-  expira_en?: string;
 }
 
 const carrito = ref<ReservaCarrito[]>([]);
-const temporizador = ref<number | null>(null);
+const confirmando = ref(false);
+const reservasConflictivas = ref<ReservaCarrito[]>([]);
+
+// Computed properties
+const usuarioLogueado = computed(() => !!user.value?.id);
+const total = computed(() => carrito.value.length * 25); // 25€ por reserva
+
+// Verificar si una reserva es conflictiva
+const esReservaConflictiva = (reserva: ReservaCarrito) => {
+  return reservasConflictivas.value.some(
+    (conflictiva) => conflictiva.fecha === reserva.fecha && conflictiva.hora === reserva.hora,
+  );
+};
 
 // Cargar carrito desde localStorage
 const cargarCarrito = () => {
@@ -85,44 +118,17 @@ const formatFecha = (fecha: string) => {
   });
 };
 
-// Calcular tiempo restante
-const tiempoRestante = (expira_en: string) => {
-  const ahora = new Date();
-  const expira = new Date(expira_en);
-  const diffMs = expira.getTime() - ahora.getTime();
-
-  if (diffMs <= 0) return 'Expirado';
-
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffSecs = Math.floor((diffMs % 60000) / 1000);
-
-  return `${diffMins}:${diffSecs.toString().padStart(2, '0')} minutos`;
-};
-
-// Verificar si hay reservas expiradas
-const hayReservasExpiradas = computed(() => {
-  const ahora = new Date();
-  return carrito.value.some((reserva) => reserva.expira_en && new Date(reserva.expira_en) < ahora);
-});
-
 // Quitar reserva del carrito
-const quitarDelCarrito = async (index: number) => {
-  const reserva = carrito.value[index];
+const quitarDelCarrito = (index: number) => {
+  const reservaEliminada = carrito.value[index];
+  carrito.value.splice(index, 1);
+  guardarCarrito();
 
-  if (!reserva) return;
-
-  try {
-    if (reserva.id) {
-      await supabase.from('reservas').delete().eq('id', reserva.id);
-    }
-
-    carrito.value.splice(index, 1);
-    guardarCarrito();
-  } catch (error) {
-    console.error('Error eliminando reserva:', error);
-    carrito.value.splice(index, 1);
-    guardarCarrito();
-  }
+  // Eliminar también de las conflictivas si estaba ahí
+  reservasConflictivas.value = reservasConflictivas.value.filter(
+    (conflictiva) =>
+      !(conflictiva.fecha === reservaEliminada.fecha && conflictiva.hora === reservaEliminada.hora),
+  );
 };
 
 // Guardar carrito en localStorage
@@ -130,65 +136,91 @@ const guardarCarrito = () => {
   localStorage.setItem('carritoReservas', JSON.stringify(carrito.value));
 };
 
-// Confirmar todas las reservas
-const confirmarReservas = async () => {
-  if (!user.value?.id) {
-    alert('Debes iniciar sesión para confirmar reservas');
-    return;
-  }
-
+// Verificar disponibilidad de TODAS las reservas
+const verificarDisponibilidad = async () => {
   try {
-    // Actualizar todas las reservas a estado "confirmada"
-    for (const reserva of carrito.value) {
-      if (reserva.id) {
-        const { error } = await supabase
-          .from('reservas')
-          .update({ estado: 'confirmada' })
-          .eq('id', reserva.id);
-
-        if (error) throw error;
-      }
+    if (carrito.value.length === 0) {
+      reservasConflictivas.value = [];
+      return;
     }
 
-    // Limpiar carrito
-    carrito.value = [];
-    guardarCarrito();
+    const horasParaVerificar = carrito.value.map((reserva) => ({
+      fecha: reserva.fecha,
+      hora: reserva.hora + ':00',
+    }));
 
-    alert('¡Reservas confirmadas exitosamente!');
-    void router.push('/AreaPersonal');
+    // Consultar TODAS las reservas confirmadas que coincidan
+    const { data: reservasOcupadas, error } = await supabase
+      .from('reservas')
+      .select('fecha, hora')
+      .eq('estado', 'confirmada')
+      .in('fecha', [...new Set(horasParaVerificar.map((h) => h.fecha))])
+      .in('hora', [...new Set(horasParaVerificar.map((h) => h.hora))]);
+
+    if (error) throw error;
+
+    // Encontrar las reservas conflictivas
+    reservasConflictivas.value = carrito.value.filter((reserva) => {
+      const horaBD = reserva.hora + ':00';
+      return reservasOcupadas.some(
+        (ocupada) => ocupada.fecha === reserva.fecha && ocupada.hora === horaBD,
+      );
+    });
   } catch (error) {
-    console.error('Error confirmando reservas:', error);
-    alert('Error al confirmar las reservas');
+    console.error('Error verificando disponibilidad:', error);
+    alert('Error al verificar disponibilidad. Por favor, intenta nuevamente.');
   }
 };
 
-// Iniciar temporizador para actualizar contadores
-const iniciarTemporizador = () => {
-  temporizador.value = window.setInterval(() => {
-    // Forzar re-renderizado para actualizar contadores
-    carrito.value = [...carrito.value];
+// Confirmar todas las reservas
+const confirmarReservas = async () => {
+  if (!usuarioLogueado.value || reservasConflictivas.value.length > 0) return;
 
-    // Si hay reservas expiradas, mostrar alerta
-    if (hayReservasExpiradas.value) {
-      // Opcional: limpiar automáticamente las expiradas
-      const ahora = new Date();
-      carrito.value = carrito.value.filter(
-        (reserva) => !reserva.expira_en || new Date(reserva.expira_en) >= ahora,
-      );
-      guardarCarrito();
+  confirmando.value = true;
+
+  try {
+    // Verificar una última vez por si acaso
+    await verificarDisponibilidad();
+    if (reservasConflictivas.value.length > 0) {
+      return;
     }
-  }, 1000);
+
+    // Insertar todas las reservas
+    const reservasParaInsertar = carrito.value.map((reserva) => ({
+      user_id: user.value!.id,
+      fecha: reserva.fecha,
+      hora: reserva.hora + ':00',
+      estado: 'confirmada',
+    }));
+
+    const { error } = await supabase.from('reservas').insert(reservasParaInsertar);
+
+    if (error) {
+      if (error.code === '23505') {
+        // Si hay conflicto durante la inserción, actualizar y mostrar
+        await verificarDisponibilidad();
+        return;
+      }
+      throw error;
+    }
+
+    // Limpiar y redirigir
+    carrito.value = [];
+    reservasConflictivas.value = [];
+    guardarCarrito();
+
+    alert('¡Reservas confirmadas exitosamente!');
+    await router.push('/AreaPersonal');
+  } catch (error) {
+    console.error('Error confirmando reservas:', error);
+    alert('Error al confirmar las reservas. Por favor, intenta nuevamente.');
+  } finally {
+    confirmando.value = false;
+  }
 };
 
 onMounted(() => {
   cargarCarrito();
-  iniciarTemporizador();
-});
-
-onUnmounted(() => {
-  if (temporizador.value) {
-    clearInterval(temporizador.value);
-  }
 });
 </script>
 
@@ -196,5 +228,18 @@ onUnmounted(() => {
 .q-item {
   border-radius: 8px;
   margin-bottom: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.bg-negative-1 {
+  background-color: #851319;
+}
+
+.text-h6 {
+  font-weight: 500;
+}
+
+.text-white {
+  color: white !important;
 }
 </style>

@@ -190,7 +190,7 @@ async function login() {
     }
 
     console.log('Usuario logueado:', data);
-    await router.push('/IndexPage');
+    await router.push('/');
   } catch (error) {
     console.error('Error inesperado:', error);
     credencialesError.value = true;
