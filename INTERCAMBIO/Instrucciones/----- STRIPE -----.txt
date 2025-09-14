@@ -1,0 +1,34 @@
+----- STRIPE -----
+
+PASOS PARA STRIPE:
+
+1. Instalar CLI supabase (tener instalado scoop en windows)
+
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
+
+2. login
+
+supabase login (powerShell)
+
+3. Keys
+
+supabase secrets set STRIPE_SECRET_KEY=sk_test_XXXX
+supabase secrets set SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi…
+
+4. crear función
+
+supabase functions new stripe-webhook
+
+5. cambiar código index.ts
+
+…
+
+6. desplegar
+
+supabase functions deploy stripe-webhook
+
+7. configurar webhook stripe
+
+checkout.session.completed y charge.refunded
+poner URL de la función (https://zleqsdfpjepdangitcxv.supabase.co/functions/v1/stripe-webhook)

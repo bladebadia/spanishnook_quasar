@@ -56,7 +56,7 @@
         <q-btn color="grey" label="Seguir Reservando" to="/HorarioReserva" outline />
         <q-btn
           color="primary"
-          label="Confirmar Reservas"
+          label="Pagar y Confirmar Reservas"
           @click="confirmarReservas"
           :disabled="!usuarioLogueado || reservasConflictivas.length > 0"
           :loading="confirmando"
@@ -67,18 +67,33 @@
       <q-banner v-if="!usuarioLogueado" class="bg-warning text-dark q-mt-md">
         ⚠️ Debes iniciar sesión para confirmar reservas
       </q-banner>
+
+      <q-banner v-if="reservasConflictivas.length > 0" class="bg-negative text-white q-mt-md">
+        <template v-if="reservasConflictivas.length === 1 && reservasConflictivas[0]">
+          ⚠️ La hora {{ reservasConflictivas[0].hora }} del
+          {{ formatFecha(reservasConflictivas[0].fecha) }} ya está ocupada. Por favor, elimínala de
+          tu carrito.
+        </template>
+        <template v-else-if="reservasConflictivas.length > 1">
+          ⚠️ Las siguientes horas ya están ocupadas:
+          <ul class="q-mt-sm">
+            <li v-for="(reserva, index) in reservasConflictivas" :key="index">
+              {{ reserva.hora }} del {{ formatFecha(reserva.fecha) }}
+            </li>
+          </ul>
+          Por favor, elimínalas de tu carrito.
+        </template>
+      </q-banner>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { supabase } from 'src/supabaseClient';
 import { useAuth } from 'src/stores/auth';
 
 const { user } = useAuth();
-const router = useRouter();
 
 interface ReservaCarrito {
   fecha: string;
@@ -96,7 +111,7 @@ const total = computed(() => carrito.value.length * 25); // 25€ por reserva
 // Verificar si una reserva es conflictiva
 const esReservaConflictiva = (reserva: ReservaCarrito) => {
   return reservasConflictivas.value.some(
-    (conflictiva) => conflictiva.fecha === reserva.fecha && conflictiva.hora === reserva.hora,
+    (conflictiva) => conflictiva?.fecha === reserva.fecha && conflictiva?.hora === reserva.hora,
   );
 };
 
@@ -104,7 +119,12 @@ const esReservaConflictiva = (reserva: ReservaCarrito) => {
 const cargarCarrito = () => {
   const carritoGuardado = localStorage.getItem('carritoReservas');
   if (carritoGuardado) {
-    carrito.value = JSON.parse(carritoGuardado);
+    try {
+      carrito.value = JSON.parse(carritoGuardado);
+    } catch (error) {
+      console.error('Error parsing carrito:', error);
+      carrito.value = [];
+    }
   }
 };
 
@@ -120,13 +140,18 @@ const formatFecha = (fecha: string) => {
 
 // Quitar reserva del carrito
 const quitarDelCarrito = (index: number) => {
+  if (index < 0 || index >= carrito.value.length) return;
+
   const reservaEliminada = carrito.value[index];
+  if (!reservaEliminada) return;
+
   carrito.value.splice(index, 1);
   guardarCarrito();
 
   // Eliminar también de las conflictivas si estaba ahí
   reservasConflictivas.value = reservasConflictivas.value.filter(
     (conflictiva) =>
+      conflictiva &&
       !(conflictiva.fecha === reservaEliminada.fecha && conflictiva.hora === reservaEliminada.hora),
   );
 };
@@ -149,7 +174,6 @@ const verificarDisponibilidad = async () => {
       hora: reserva.hora + ':00',
     }));
 
-    // Consultar TODAS las reservas confirmadas que coincidan
     const { data: reservasOcupadas, error } = await supabase
       .from('reservas')
       .select('fecha, hora')
@@ -159,61 +183,67 @@ const verificarDisponibilidad = async () => {
 
     if (error) throw error;
 
-    // Encontrar las reservas conflictivas
-    reservasConflictivas.value = carrito.value.filter((reserva) => {
-      const horaBD = reserva.hora + ':00';
-      return reservasOcupadas.some(
-        (ocupada) => ocupada.fecha === reserva.fecha && ocupada.hora === horaBD,
-      );
-    });
+    reservasConflictivas.value =
+      carrito.value.filter((reserva) => {
+        const horaBD = reserva.hora + ':00';
+        return reservasOcupadas?.some(
+          (ocupada) => ocupada?.fecha === reserva.fecha && ocupada?.hora === horaBD,
+        );
+      }) || [];
   } catch (error) {
     console.error('Error verificando disponibilidad:', error);
     alert('Error al verificar disponibilidad. Por favor, intenta nuevamente.');
   }
 };
 
-// Confirmar todas las reservas
+// Confirmar reservas y crear sesión de Stripe
+// En la función confirmarReservas
 const confirmarReservas = async () => {
   if (!usuarioLogueado.value || reservasConflictivas.value.length > 0) return;
-
   confirmando.value = true;
 
   try {
-    // Verificar una última vez por si acaso
-    await verificarDisponibilidad();
-    if (reservasConflictivas.value.length > 0) {
-      return;
-    }
-
-    // Insertar todas las reservas
-    const reservasParaInsertar = carrito.value.map((reserva) => ({
-      user_id: user.value!.id,
-      fecha: reserva.fecha,
-      hora: reserva.hora + ':00',
-      estado: 'confirmada',
+    const line_items = carrito.value.map((reserva) => ({
+      price_data: {
+        currency: 'eur',
+        product_data: { name: `Reserva clase español ${reserva.fecha} ${reserva.hora}` },
+        unit_amount: 25 * 100,
+      },
+      quantity: 1,
     }));
 
-    const { error } = await supabase.from('reservas').insert(reservasParaInsertar);
+    // JSON válido para metadata
+    const reservasMetadata = carrito.value.map((r) => ({ fecha: r.fecha, hora: r.hora }));
 
-    if (error) {
-      if (error.code === '23505') {
-        // Si hay conflicto durante la inserción, actualizar y mostrar
-        await verificarDisponibilidad();
-        return;
-      }
-      throw error;
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) throw new Error('Usuario no autenticado');
+
+    const res = await fetch(
+      'https://zleqsdfpjepdangitcxv.supabase.co/functions/v1/stripe-webhook',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ line_items, reservas: reservasMetadata, user_id: user.value!.id }),
+      },
+    );
+
+    if (!res.ok) throw new Error('Error al crear la sesión de pago');
+
+    const responseData = await res.json();
+    if (!responseData.url) throw new Error('No se pudo obtener la URL de Stripe Checkout');
+
+    window.location.href = responseData.url;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error('❌ Error confirmando reservas:', err);
+      alert(err.message);
+    } else {
+      console.error('❌ Error confirmando reservas (no Error object):', err);
+      alert('Error al confirmar reservas');
     }
-
-    // Limpiar y redirigir
-    carrito.value = [];
-    reservasConflictivas.value = [];
-    guardarCarrito();
-
-    alert('¡Reservas confirmadas exitosamente!');
-    await router.push('/AreaPersonal');
-  } catch (error) {
-    console.error('Error confirmando reservas:', error);
-    alert('Error al confirmar las reservas. Por favor, intenta nuevamente.');
   } finally {
     confirmando.value = false;
   }
@@ -221,6 +251,7 @@ const confirmarReservas = async () => {
 
 onMounted(() => {
   cargarCarrito();
+  void verificarDisponibilidad();
 });
 </script>
 

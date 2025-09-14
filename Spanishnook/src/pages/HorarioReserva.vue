@@ -230,7 +230,7 @@ const estaEnCarrito = (hora: string) => {
 };
 
 // Agregar al carrito
-const agregarAlCarrito = async (hora: string) => {
+const agregarAlCarrito = (hora: string) => {
   if (!user.value?.id || !fechaSeleccionada.value) return;
 
   // Verificar si ya está ocupado

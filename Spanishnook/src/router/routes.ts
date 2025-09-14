@@ -18,6 +18,16 @@ const routes: RouteRecordRaw[] = [
     },
     meta: { requiresAuth: true, layout: 'empty' },
   },
+    {
+    path: '/success',
+    component: () => import('pages/success.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
+    {
+    path: '/cancel',
+    component: () => import('pages/cancel.vue'),
+    meta: { requiresAuth: false, layout: 'empty' },
+  },
   {
     path: '/ClasesGrupales',
     component: () => import('pages/ClasesGrupales.vue'),
