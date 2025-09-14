@@ -15,7 +15,6 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req: Request) => {
-  // Preflight CORS
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
@@ -23,12 +22,11 @@ Deno.serve(async (req: Request) => {
   try {
     const stripeSig = req.headers.get("stripe-signature");
 
-    // Webhook Stripe
     if (stripeSig) {
       const rawBody = await req.text();
       const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
       if (!webhookSecret) {
-        console.error("❌ Falta STRIPE_WEBHOOK_SECRET en variables de entorno");
+        console.error("❌ Falta STRIPE_WEBHOOK_SECRET");
         return new Response("Webhook secret not configured", { status: 500, headers: corsHeaders });
       }
 
@@ -36,7 +34,7 @@ Deno.serve(async (req: Request) => {
       try {
         event = await stripe.webhooks.constructEventAsync(rawBody, stripeSig, webhookSecret);
       } catch (err: any) {
-        console.error("❌ Verificación de firma fallida:", err?.message);
+        console.error("❌ Firma webhook inválida:", err?.message);
         return new Response(`Webhook Error: ${err?.message}`, { status: 400, headers: corsHeaders });
       }
 
@@ -44,7 +42,6 @@ Deno.serve(async (req: Request) => {
       const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SERVICE_ROLE_KEY")!);
 
       try {
-        // Pago completado → crear reservas confirmadas
         if (event.type === "checkout.session.completed") {
           const session = event.data.object as Stripe.Checkout.Session;
 
@@ -58,22 +55,56 @@ Deno.serve(async (req: Request) => {
             console.error("❌ Error parseando metadata.reservas:", raw);
           }
 
-          if (Array.isArray(reservas) && reservas.length > 0 && userId) {
-            const { error } = await supabase.from("reservas").insert(
-              reservas.map(r => ({
-                fecha: r.fecha,
-                hora: r.hora + ":00",
-                estado: "confirmada",
-                user_id: userId,
-              }))
-            );
+          if (!Array.isArray(reservas) || !userId) return new Response(JSON.stringify({ received: true }), { status: 200, headers: corsHeaders });
 
-            if (error) console.error("❌ Error creando reservas tras pago:", error);
-            else console.log("✅ Reservas confirmadas tras pago:", reservas);
+          // 🔹 1. Verificar si reservas ya están ocupadas
+          const { data: ocupadas, error: errorCheck } = await supabase
+            .from("reservas")
+            .select("fecha, hora")
+            .eq("estado", "confirmada")
+            .in("fecha", reservas.map(r => r.fecha))
+            .in("hora", reservas.map(r => r.hora + ":00"));
+
+          if (errorCheck) console.error("❌ Error verificando reservas:", errorCheck);
+
+          if (ocupadas && ocupadas.length > 0) {
+            console.log("❌ Reservas ocupadas, se hará reembolso");
+
+            // 🔹 2. Reembolso seguro
+            const paymentIntentId = typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : session.payment_intent?.id;
+
+            if (paymentIntentId) {
+              try {
+                await stripe.refunds.create({ payment_intent: paymentIntentId });
+                console.log("✅ Reembolso realizado:", paymentIntentId);
+              } catch (err: any) {
+                console.error("❌ Error realizando reembolso:", err);
+              }
+            }
+
+            return new Response(
+              JSON.stringify({ received: true, error: "Reservas ocupadas, pago reembolsado" }),
+              { status: 409, headers: corsHeaders }
+            );
           }
+
+          // 🔹 3. Insertar reservas confirmadas
+          const { error: insertError } = await supabase.from("reservas").insert(
+            reservas.map(r => ({
+              fecha: r.fecha,
+              hora: r.hora + ":00",
+              estado: "confirmada",
+              user_id: userId,
+            }))
+          );
+
+          if (insertError) console.error("❌ Error creando reservas:", insertError);
+          else console.log("✅ Reservas confirmadas:", reservas);
         }
 
-        // Reembolso
+        // 🔹 4. Manejo de reembolsos (charge.refunded)
         if (event.type === "charge.refunded" || event.type === "charge.refund.updated") {
           const charge = event.data.object as Stripe.Charge;
           const raw = charge.metadata?.reservas ?? "";
@@ -82,7 +113,7 @@ Deno.serve(async (req: Request) => {
           if (ids.length > 0) {
             const { error } = await supabase.from("reservas").update({ estado: "cancelada" }).in("id", ids);
             if (error) console.error("❌ Error cancelando reservas:", error);
-            else console.log("✅ Reservas canceladas (refund):", ids);
+            else console.log("✅ Reservas canceladas por reembolso:", ids);
           }
         }
       } catch (err: any) {
@@ -92,7 +123,7 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ received: true }), { status: 200, headers: corsHeaders });
     }
 
-    // FRONTEND → crear sesión Checkout
+    // 🔹 Crear sesión de Checkout (frontend)
     const body = await req.json().catch(() => null);
     if (!body) return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: corsHeaders });
 
@@ -105,17 +136,17 @@ Deno.serve(async (req: Request) => {
       payment_method_types: ["card"],
       mode: "payment",
       line_items,
-      success_url: `http://localhost:9000/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `http://localhost:9000/successPage?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `http://localhost:9000/cancel`,
       metadata: {
-        reservas: JSON.stringify(reservas), // ✅ enviar como string JSON
+        reservas: JSON.stringify(reservas),
         user_id,
       },
     });
 
     return new Response(JSON.stringify({ url: session.url }), { status: 200, headers: corsHeaders });
   } catch (err: any) {
-    console.error("❌ Error inesperado en la función:", err);
+    console.error("❌ Error inesperado:", err);
     return new Response(JSON.stringify({ error: err?.message ?? String(err) }), { status: 500, headers: corsHeaders });
   }
 });

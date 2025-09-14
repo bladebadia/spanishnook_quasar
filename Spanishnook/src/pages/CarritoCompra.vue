@@ -115,7 +115,7 @@ const esReservaConflictiva = (reserva: ReservaCarrito) => {
   );
 };
 
-// Cargar carrito desde localStorage
+// Cargar carrito desde sessionStorage
 const cargarCarrito = () => {
   const carritoGuardado = localStorage.getItem('carritoReservas');
   if (carritoGuardado) {
@@ -126,6 +126,11 @@ const cargarCarrito = () => {
       carrito.value = [];
     }
   }
+};
+
+// Guardar carrito en sessionStorage
+const guardarCarrito = () => {
+  localStorage.setItem('carritoReservas', JSON.stringify(carrito.value));
 };
 
 // Formatear fecha
@@ -154,11 +159,6 @@ const quitarDelCarrito = (index: number) => {
       conflictiva &&
       !(conflictiva.fecha === reservaEliminada.fecha && conflictiva.hora === reservaEliminada.hora),
   );
-};
-
-// Guardar carrito en localStorage
-const guardarCarrito = () => {
-  localStorage.setItem('carritoReservas', JSON.stringify(carrito.value));
 };
 
 // Verificar disponibilidad de TODAS las reservas
@@ -197,7 +197,6 @@ const verificarDisponibilidad = async () => {
 };
 
 // Confirmar reservas y crear sesión de Stripe
-// En la función confirmarReservas
 const confirmarReservas = async () => {
   if (!usuarioLogueado.value || reservasConflictivas.value.length > 0) return;
   confirmando.value = true;
@@ -212,7 +211,6 @@ const confirmarReservas = async () => {
       quantity: 1,
     }));
 
-    // JSON válido para metadata
     const reservasMetadata = carrito.value.map((r) => ({ fecha: r.fecha, hora: r.hora }));
 
     const {

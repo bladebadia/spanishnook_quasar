@@ -118,23 +118,6 @@ const fechaMaxima = computed(() => {
   return date.toISOString().split('T')[0];
 });
 
-// Configurar nombres de días y meses en español
-const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-const months = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre',
-];
-
 // Horarios disponibles
 const todosLosHorarios = [
   '09:00',
@@ -184,12 +167,12 @@ const opcionesFechas = (date: string) => {
 // Formatear fecha en español
 const formatFecha = (fecha: string) => {
   const d = new Date(fecha);
-  const weekday = weekdays[d.getDay()];
-  const day = d.getDate();
-  const month = months[d.getMonth()];
-  const year = d.getFullYear();
-
-  return `${weekday} ${day} de ${month} de ${year}`;
+  return d.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 };
 
 // Cargar TODAS las horas ocupadas (solo confirmadas)
@@ -211,11 +194,7 @@ const cargarHorariosOcupados = async (fecha: string) => {
       return;
     }
 
-    // Normalizar las horas
-    horasOcupadas.value = reservasConfirmadas.map((r) => {
-      const [hora, minuto] = r.hora.split(':');
-      return `${hora}:${minuto}`;
-    });
+    horasOcupadas.value = reservasConfirmadas.map((r) => r.hora.slice(0, 5)); // HH:mm
   } catch (error) {
     console.error('Error cargando horarios ocupados:', error);
     horasOcupadas.value = [];
@@ -233,19 +212,16 @@ const estaEnCarrito = (hora: string) => {
 const agregarAlCarrito = (hora: string) => {
   if (!user.value?.id || !fechaSeleccionada.value) return;
 
-  // Verificar si ya está ocupado
   if (horasOcupadas.value.includes(hora)) {
     alert('Este horario ya no está disponible. Por favor, elige otro.');
     return;
   }
 
-  // Verificar si ya está en el carrito
   if (estaEnCarrito(hora)) {
     alert('Este horario ya está en tu carrito.');
     return;
   }
 
-  // Añadir al carrito local
   carrito.value.push({
     fecha: fechaSeleccionada.value,
     hora: hora,
@@ -258,8 +234,8 @@ const agregarAlCarrito = (hora: string) => {
 const quitarDelCarrito = async (index: number) => {
   if (index < 0 || index >= carrito.value.length) return;
 
-  const reserva = carrito.value[index];
-  if (!reserva) return;
+  const reserva: ReservaCarrito | undefined = carrito.value[index];
+  if (!reserva) return; // aquí TS ya sabe que no puede ser undefined
 
   carrito.value.splice(index, 1);
   guardarCarrito();
@@ -270,12 +246,12 @@ const quitarDelCarrito = async (index: number) => {
   }
 };
 
-// Guardar carrito en localStorage
+// ✅ Guardar carrito
 const guardarCarrito = () => {
   localStorage.setItem('carritoReservas', JSON.stringify(carrito.value));
 };
 
-// Cargar carrito desde localStorage
+// ✅ Cargar carrito
 const cargarCarrito = () => {
   const carritoGuardado = localStorage.getItem('carritoReservas');
   if (carritoGuardado) {
@@ -312,7 +288,6 @@ const cargarMisReservas = async () => {
 const cancelarReserva = async (reservaId: string) => {
   try {
     const { error } = await supabase.from('reservas').delete().eq('id', reservaId);
-
     if (error) throw error;
 
     misReservas.value = misReservas.value.filter((reserva) => reserva.id !== reservaId);

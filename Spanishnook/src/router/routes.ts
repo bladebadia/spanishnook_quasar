@@ -19,8 +19,8 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, layout: 'empty' },
   },
     {
-    path: '/success',
-    component: () => import('pages/success.vue'),
+    path: '/successPage',
+    component: () => import('pages/successPage.vue'),
     meta: { requiresAuth: false, layout: 'empty' },
   },
     {

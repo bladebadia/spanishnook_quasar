@@ -325,6 +325,8 @@ const iniciarTemporizadorCarrito = () => {
 
 onMounted(() => {
   showCookiesBanner.value = localStorage.getItem('cookies_accepted') !== 'true';
+  localStorage.removeItem('carritoReservas');
+  carritoCount.value = 0;
   cargarCarrito();
   setupCarritoListener();
   iniciarTemporizadorCarrito();
