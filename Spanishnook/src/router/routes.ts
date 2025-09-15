@@ -25,7 +25,7 @@ const routes: RouteRecordRaw[] = [
   },
     {
     path: '/cancel',
-    component: () => import('pages/cancel.vue'),
+    component: () => import('pages/cancelPage.vue'),
     meta: { requiresAuth: false, layout: 'empty' },
   },
   {
