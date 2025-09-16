@@ -1,5 +1,4 @@
-// Handler para Quasar SSR en Vercel
+// Handler para Quasar SSR en Vercel usando dist/ssr
 
-import { handler } from '../.output/server';
-
-export default handler;
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+module.exports = require('../dist/ssr/index.js');
