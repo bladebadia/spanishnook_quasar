@@ -1,0 +1,4 @@
+// Handler para Quasar SSR en Vercel usando dist/ssr
+
+import handler from '../dist/ssr/index.js';
+export default handler;
