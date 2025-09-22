@@ -42,25 +42,37 @@
       </q-btn>
     </div>
 
-    <div v-intersect="onImgIntersect" style="width: 100%;" class="row q-mb-xl full-width">
-    <transition name="slide-fade-left">
-      <div v-if="showAnimatedImg" class="row q-my-xl q-py-xl" style="width: 100%; position: relative; min-height: 300px;">
-        <img
-          src="/img/animacion1.png"
-          alt="Estudiantes"
-          class="img-animada move-lr"
-          style="max-width: 300px; width: 100%; position: absolute; left: 0; top: 0; margin: 0; padding: 0;"
-          @animationend="mostrarBocadillo = true"
+    <div v-intersect="onImgIntersect" style="width: 100%" class="row q-mb-xl full-width">
+      <transition name="slide-fade-left">
+        <div
+          v-if="showAnimatedImg"
+          class="row q-my-xl q-py-xl"
+          style="width: 100%; position: relative; min-height: 300px"
+        >
+          <img
+            src="/img/animacion1.png"
+            alt="Estudiantes"
+            class="img-animada move-lr"
+            style="
+              max-width: 300px;
+              width: 100%;
+              position: absolute;
+              left: 0;
+              top: 0;
+              margin: 0;
+              padding: 0;
+            "
+            @animationend="mostrarBocadillo = true"
           />
-        <transition name="fade">
-          <div v-if="mostrarBocadillo" class="bocadillo-texto">
-            ¡Bienvenid@ a
-            <br/>Spanish Nook!
-          </div>
-        </transition>
-      </div>
-    </transition>
-  </div>
+          <transition name="fade">
+            <div v-if="mostrarBocadillo" class="bocadillo-texto">
+              ¡Bienvenid@ a
+              <br />Spanish Nook!
+            </div>
+          </transition>
+        </div>
+      </transition>
+    </div>
 
     <!-- Card promocional que aparece al hacer scroll -->
     <div
@@ -243,7 +255,6 @@
       </transition>
     </div>
 
-    <!-- Sobre Spanish nook -->
     <div v-intersect="onPromoIntersect4" class="q-mt-xl q-mb-xl row flex flex-center">
       <transition enter-active-class="animated fadeInUpBig slower ">
         <div
@@ -394,24 +405,18 @@ const showAnimatedImg = ref(false);
 
 // Solo mostrar la animación una vez por sesión
 
-
-
-
-
-  let animacionMostrada = false;
-  function onImgIntersect(entry: IntersectionObserverEntry) {
-    if (entry.isIntersecting && !animacionMostrada) {
-      showAnimatedImg.value = false;
-      setTimeout(() => {
-        showAnimatedImg.value = true;
-        animacionMostrada = true;
-      }, 10);
-    }
-    // No ocultar la animación ni el bocadillo al salir del viewport
-    return true;
+let animacionMostrada = false;
+function onImgIntersect(entry: IntersectionObserverEntry) {
+  if (entry.isIntersecting && !animacionMostrada) {
+    showAnimatedImg.value = false;
+    setTimeout(() => {
+      showAnimatedImg.value = true;
+      animacionMostrada = true;
+    }, 10);
   }
-
-
+  // No ocultar la animación ni el bocadillo al salir del viewport
+  return true;
+}
 
 function onPromoIntersect(entry: IntersectionObserverEntry): boolean {
   if (entry.isIntersecting) {
@@ -421,14 +426,14 @@ function onPromoIntersect(entry: IntersectionObserverEntry): boolean {
 }
 
 function onPromoIntersect1(entry: IntersectionObserverEntry): boolean {
-  if (entry.isIntersecting ) {
+  if (entry.isIntersecting) {
     showPromoCard1.value = true;
   }
   return true;
 }
 
 function onPromoIntersect2(entry: IntersectionObserverEntry): boolean {
-  if (entry.isIntersecting ) {
+  if (entry.isIntersecting) {
     showPromoCard2.value = true;
   }
   return true;
@@ -487,7 +492,7 @@ function onPromoIntersect4(entry: IntersectionObserverEntry): boolean {
 
 @media (max-width: 900px) {
   .titulo-responsivo {
-    font-size: 2.3rem;
+    font-size: 1.8rem;
   }
 }
 
@@ -600,53 +605,58 @@ function onPromoIntersect4(entry: IntersectionObserverEntry): boolean {
 }
 
 .bocadillo-texto {
-    position: absolute;
-    right: 600px;
-    top: 40px;
-    background: #f9f9f8;
-    border-radius: 50% 50% 60% 60% / 60% 60% 50% 50%;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07), 0 0 0 8px #e0e7ff inset;
-    padding: 28px 38px 24px 38px;
-    font-size: 1.2rem;
-    color: #333333;
-    min-width: 180px;
-    z-index: 10;
-    border: 2px solid #2f06e4;
-    transform: rotate(-30deg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    box-sizing: border-box;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.10));
-  }
-  .bocadillo-texto::after, .bocadillo-texto::before {
-    content: '';
-    position: absolute;
-    background: #f9f9f8;
-    border: 2px solid #2f06e4;
-    z-index: 9;
-  }
-  .bocadillo-texto::after {
-    width: 38px;
-    height: 38px;
-    left: 80%;
-    top: 80%;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  }
-  .bocadillo-texto::before {
-    width: 22px;
-    height: 22px;
-    left: 95%;
-    top: 95%;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  }
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity 0.5s;
-  }
-  .fade-enter-from, .fade-leave-to {
-    opacity: 0;
-  }
+  position: absolute;
+  right: 600px;
+  top: 40px;
+  background: #f9f9f8;
+  border-radius: 50% 50% 60% 60% / 60% 60% 50% 50%;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.07),
+    0 0 0 8px #e0e7ff inset;
+  padding: 28px 38px 24px 38px;
+  font-size: 1.2rem;
+  color: #333333;
+  min-width: 180px;
+  z-index: 10;
+  border: 2px solid #2f06e4;
+  transform: rotate(-30deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  box-sizing: border-box;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+}
+.bocadillo-texto::after,
+.bocadillo-texto::before {
+  content: '';
+  position: absolute;
+  background: #f9f9f8;
+  border: 2px solid #2f06e4;
+  z-index: 9;
+}
+.bocadillo-texto::after {
+  width: 38px;
+  height: 38px;
+  left: 80%;
+  top: 80%;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+.bocadillo-texto::before {
+  width: 22px;
+  height: 22px;
+  left: 95%;
+  top: 95%;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

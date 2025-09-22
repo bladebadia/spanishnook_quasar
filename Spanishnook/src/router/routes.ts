@@ -18,16 +18,6 @@ const routes: RouteRecordRaw[] = [
     },
     meta: { requiresAuth: true, layout: 'empty' },
   },
-    {
-    path: '/successPage',
-    component: () => import('pages/successPage.vue'),
-    meta: { requiresAuth: false, layout: 'empty' },
-  },
-    {
-    path: '/cancel',
-    component: () => import('pages/cancelPage.vue'),
-    meta: { requiresAuth: false, layout: 'empty' },
-  },
   {
     path: '/ClasesGrupales',
     component: () => import('pages/ClasesGrupales.vue'),
@@ -91,11 +81,6 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/Condiciones',
     component: () => import('pages/legalCondicionesVenta.vue'),
-    meta: { requiresAuth: false, layout: 'empty' },
-  },
-  {
-    path: '/HorarioReserva',
-    component: () => import('pages/HorarioReserva.vue'),
     meta: { requiresAuth: false, layout: 'empty' },
   },
   {
