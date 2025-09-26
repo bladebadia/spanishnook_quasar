@@ -36,7 +36,7 @@
 
     <!-- Botones de acción -->
     <div class="column items-start q-gutter-y-md q-mt-lg">
-      <q-btn color="primary" label="Hacer Nueva Reserva" icon="add" to="/HorarioReserva" />
+      <q-btn color="primary" label="Hacer Nueva Reserva" icon="add" to="/ClasesIndividuales" />
 
       <q-btn
         color="negative"

@@ -7,9 +7,6 @@
         <q-btn to="/AreaPersonal" v-if="user" flat dense class="text-white underline-btn q-mx-md"
           >Area Personal
         </q-btn>
-        <q-btn to="/HorarioReserva" v-if="user" flat dense class="text-white underline-btn q-mx-md"
-          >Reserva
-        </q-btn>
         <q-btn to="/Acceder" v-if="!user" flat dense class="text-white underline-btn q-mx-md"
           >Acceder
         </q-btn>
@@ -77,7 +74,6 @@
           v-if="$q.screen.gt.sm"
         >
           <q-route-tab to="/" name="tab1" Class="q-tab">Inicio</q-route-tab>
-          <q-route-tab to="/sobreSpanish" name="tab5" Class="q-tab">Sobre Spanish Nook</q-route-tab>
           <q-btn-dropdown auto-close stretch flat class="q-tab q-pb-sm" label="Clases">
             <q-list>
               <q-item clickable @click="$router.push('/ClasesGrupales')">
@@ -91,7 +87,8 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-route-tab to="/TestNivel" name="tab3" class="q-tab">Test de nivel</q-route-tab>
+          <q-route-tab to="/TestNivel" name="tab2" class="q-tab">Test de nivel</q-route-tab>
+          <q-route-tab to="/sobreSpanish" name="tab3" Class="q-tab">Sobre</q-route-tab>
           <q-route-tab to="/Contacto" name="tab4" class="q-tab">Contacto</q-route-tab>
         </q-tabs>
         <q-space v-if="$q.screen.gt.sm" />

@@ -7,9 +7,6 @@
         <q-btn to="/AreaPersonal" v-if="user" flat dense class="text-white underline-btn q-mx-md"
           >Area Personal
         </q-btn>
-        <q-btn to="/HorarioReserva" v-if="user" flat dense class="text-white underline-btn q-mx-md"
-          >Reserva
-        </q-btn>
         <q-btn to="/Acceder" v-if="!user" flat dense class="text-white underline-btn q-mx-md"
           >Acceder
         </q-btn>
@@ -77,8 +74,8 @@
           v-if="$q.screen.gt.sm"
         >
           <q-route-tab to="/" name="tab1" Class="q-tab">Inicio</q-route-tab>
-          <q-route-tab to="/sobreSpanish" name="tab5" Class="q-tab">Sobre Spanish Nook</q-route-tab>
-          <q-btn-dropdown auto-close stretch flat class="q-tab q-pb-sm" label="Clases">
+
+          <q-btn-dropdown auto-close stretch flat class="q-tab" label="Clases">
             <q-list>
               <q-item clickable @click="$router.push('/ClasesGrupales')">
                 <q-item-section class="q-tab">Clases grupales</q-item-section>
@@ -91,7 +88,8 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-route-tab to="/TestNivel" name="tab3" class="q-tab">Test de nivel</q-route-tab>
+          <q-route-tab to="/TestNivel" name="tab2" class="q-tab">Test de nivel</q-route-tab>
+          <q-route-tab to="/sobreSpanish" name="tab3" Class="q-tab">Sobre</q-route-tab>
           <q-route-tab to="/Contacto" name="tab4" class="q-tab">Contacto</q-route-tab>
         </q-tabs>
         <q-space v-if="$q.screen.gt.sm" />
@@ -185,9 +183,7 @@
           </div>
 
           <router-link to="/IndexPage" class="footer-link q-mb-xs q-mt-md">Inicio</router-link>
-          <router-link to="/sobreSpanish" class="footer-link q-mb-xs"
-            >Sobre Spanish Nook</router-link
-          >
+
           <router-link to="/ClasesGrupales" class="footer-link q-mb-xs"
             >Clases grupales</router-link
           >
@@ -198,6 +194,9 @@
             >Ejercicios de español</router-link
           >
           <router-link to="/TestNivel" class="footer-link q-mb-xs">Test de nivel</router-link>
+          <router-link to="/sobreSpanish" class="footer-link q-mb-xs"
+            >Sobre Spanish Nook</router-link
+          >
           <router-link to="/Contacto" class="footer-link">Contacto</router-link>
         </div>
         <!-- Columna Enlaces de interés -->
@@ -428,7 +427,7 @@ function toggleLeftDrawer() {
   }
 }
 
-.q-tab {
+/*.q-tab {
   font-size: 1.3rem !important;
   font-weight: medium !important;
   transition: font-size 0.4s;
@@ -437,7 +436,7 @@ function toggleLeftDrawer() {
 }
 .q-tab:hover {
   font-size: 1.6rem !important;
-}
+} */
 
 /* Estilos para la notificación del carrito */
 .badge-notification {

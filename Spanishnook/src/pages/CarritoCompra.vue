@@ -3,9 +3,14 @@
     <h4>🛒 Carrito de Reservas</h4>
 
     <div v-if="carrito.length === 0" class="text-center q-mt-xl">
-      <q-icon name="shopping_cart" size="100px" color="grey-4" />
-      <p class="text-grey q-mt-md">Tu carrito está vacío</p>
-      <q-btn color="primary" label="Volver a Reservas" to="/HorarioReserva" class="q-mt-md" />
+      <q-icon name="shopping_cart" size="100px" color="black-4" />
+      <p class="text-black q-mt-md">Tu carrito está vacío</p>
+      <q-btn
+        color="primary"
+        label="Ir a Clases individuales"
+        to="/ClasesIndividuales"
+        class="q-mt-md"
+      />
     </div>
 
     <div v-else>
@@ -40,7 +45,7 @@
       </q-list>
 
       <!-- Resumen del pedido -->
-      <div class="bg-grey-2 q-pa-md rounded-borders q-mb-lg">
+      <div class="bg-yellow-2 q-pa-md rounded-borders q-mb-lg">
         <h6>Resumen del Pedido</h6>
         <div class="row justify-between items-center">
           <span>{{ carrito.length }} reserva(s)</span>
@@ -53,7 +58,7 @@
 
       <!-- Botones de acción -->
       <div class="row q-gutter-md justify-end">
-        <q-btn color="grey" label="Seguir Reservando" to="/HorarioReserva" outline />
+        <q-btn color="grey" label="Seguir Reservando" to="/ClasesIndividuales" outline />
         <q-btn
           color="primary"
           label="Pagar y Confirmar Reservas"
