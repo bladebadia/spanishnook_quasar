@@ -40,27 +40,6 @@
 
     </div>
 
-<!-- Timeline horizontal con q-stepper -->
-    <div class="q-my-xl">
-      <q-stepper   alternative-labels  v-model="step" >
-        <q-step name="Paso 1" title="Paso 1" done-icon='looks_one'
-                caption="Descripción del primer paso"
-                :done="true">
-        </q-step>
-        <q-step name="2" title="Paso 2" done-icon="looks_two" :done="true"
-                caption="Lorem ipsum dolor sit amet"
-                >
-        </q-step>
-        <q-step name="Paso 3" title="Paso 3" done-icon="looks_3" :done="true"
-                caption="Descripción del tercer paso"
-                >
-        </q-step>
-        <q-step name="Paso 4" title="Paso 4" done-icon="looks_4" :done="true"
-                caption="Descripción del cuarto paso"
-                >
-        </q-step>
-      </q-stepper>
-    </div>
 
     <!-- Questions Page -->
     <div v-if="!testCompleted && currentQuestion > 0 && !showResults">
@@ -229,7 +208,7 @@ const testCompleted = ref(false);
 const testScore = ref(0);
 const testLevel = ref('');
 const showResults = ref(false);
-const step = ref(1);
+//const step = ref(1);
 const testQuestions = [
   {
     question: "1 ¿Cómo se escribe '2976' en español?",

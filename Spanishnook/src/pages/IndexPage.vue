@@ -45,13 +45,7 @@
     <div v-intersect="onImgIntersect" style="width: 100%;" class="row q-mb-xl full-width">
     <transition name="slide-fade-left">
       <div v-if="showAnimatedImg" class="row q-my-xl q-py-xl" style="width: 100%; position: relative; min-height: 300px;">
-        <img
-          src="/img/animacion1.png"
-          alt="Estudiantes"
-          class="img-animada move-lr"
-          style="max-width: 300px; width: 100%; position: absolute; left: 0; top: 0; margin: 0; padding: 0;"
-          @animationend="mostrarBocadillo = true"
-          />
+        <q-video src="/img/AN1_frida_ok.mov" autoplay loop muted ></q-video>
         <transition name="fade">
           <div v-if="mostrarBocadillo" class="bocadillo-texto">
             ¡Bienvenid@ a

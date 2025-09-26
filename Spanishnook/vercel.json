@@ -1,5 +1,12 @@
 {
   "routes": [
-    { "src": "/(.*)", "dest": "/api/index.cjs" }
+    {
+      "src": "/client/(.*)",
+      "dest": "/dist/ssr/client/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.mjs"
+    }
   ]
 }
