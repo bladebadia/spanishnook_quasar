@@ -1,105 +1,145 @@
 <template>
   <q-layout view="lHh Lpr fff">
+    <!-- Inicio  -->
     <q-header elevated>
-      <q-bar class="">
+      <!-- Inicio barra superior -->
+      <q-bar>
         <q-space></q-space>
-
-        <q-btn to="/AreaPersonal" v-if="user" flat dense class="text-white underline-btn q-mx-md"
-          >Area Personal
+        <!-- Boton Area Personal -->
+        <q-btn to="/AreaPersonal" v-if="user" flat 
+          class="text-white btn-barra-superior"
+      
+          >{{ $t('areaPersonal') }}
         </q-btn>
-        <q-btn to="/Acceder" v-if="!user" flat dense class="text-white underline-btn q-mx-md"
-          >Acceder
+        <!-- Boton Acceder / Carrito -->
+        <q-btn
+          to="/Acceder"
+          v-if="!user"
+          class="text-white btn-barra-superior"
+          >{{ $t('acceder') }}
         </q-btn>
         <q-btn
           to="/CarritoCompra"
-          v-if="user"
-          flat
-          dense
-          class="text-white q-mx-md relative-position"
+          v-if="user"         
+          class="text-white carrito-btn"
           icon="shopping_cart"
         >
           <q-badge v-if="carritoCount > 0" color="red" floating rounded class="badge-notification">
             {{ carritoCount }}
           </q-badge>
         </q-btn>
-        <q-separator size="180px" color="white" />
-        <div class="row items-center q-gutter-sm" style="width: 100%; max-width: 250px">
-          <span class="text-body1" style="white-space: nowrap">Idioma:</span>
-          <q-select
-            v-model="locale"
-            :options="langOptions"
-            emit-value
-            map-options
-            dense
-            outlined
-            color="primary"
-            bg-color="white"
-            style="flex: 1; max-width: 130px"
-            @update:model-value="changeLang"
-          />
+        
+        <!-- Selector de idioma con banderas -->
+        <div class="row items-center q-gutter-xs">
+          <q-btn              
+            :class="locale === 'es-ES' ? 'flag-selected' : 'flag-unselected'"
+            @click="changeLang('es-ES')"
+            class="flag-btn flag-es"
+          >
+            <q-img
+              src="https://flagcdn.com/w40/es.png"
+              alt="Español"
+              style="width: 24px; height: 16px;"
+            />
+          </q-btn>
+          <q-btn           
+            :class="locale === 'en-US' ? 'flag-selected' : 'flag-unselected'"
+            @click="changeLang('en-US')"
+            class="flag-btn flag-en"
+          >
+            <q-img
+              src="https://flagcdn.com/w40/gb.png"
+              alt="English"
+              style="width: 24px; height: 16px; border-radius: 2px"
+            />
+          </q-btn>
         </div>
       </q-bar>
 
       <q-toolbar>
         <q-btn
-          v-if="$q.screen.lt.md"
-          flat
-          dense
+          v-if="$q.screen.lt.md" 
+          flat         
           round
           icon="menu"
           aria-label="Menu"
           @click="toggleLeftDrawer"
+          style="font-size: 1rem"
         />
 
         <img
           round
           src="/img/Logotexto_500.png"
           alt="Logo Spanish nook"
-          style="
-            height: 50px;
-            width: auto;
-            min-width: 0;
-            margin: 0;
-            padding: 0;
-            display: inline-block;
-          "
-          fit="contain"
-          class="q-mr-md"
+          class="logo-responsivo"        
+         
         />
-        <q-toolbar-title> Spanish nook </q-toolbar-title>
-        <q-tabs
-          class="flex flex-justify justify-center align-justify q-m-lg"
-          shrink
-          stretch
-          v-if="$q.screen.gt.sm"
-        >
-          <q-route-tab to="/" name="tab1" Class="q-tab">Inicio</q-route-tab>
-
-          <q-btn-dropdown auto-close stretch flat class="q-tab" label="Clases">
+        <q-toolbar-title class="spanishnook-title"> Spanishnook </q-toolbar-title>
+        <q-space v-if="$q.screen.gt.sm"/>
+        <!-- Navegación con botones -->
+        <div class=" nav-container  " v-if="$q.screen.gt.sm">
+          <q-btn 
+            flat 
+            :to="'/'" 
+            exact 
+            class="nav-btn"
+            :class="{ 'nav-btn-active': activeButton === 'inicio' }"            
+          >
+            {{ $t('inicio') }}
+          </q-btn>
+    
+          <q-btn-dropdown 
+            flat 
+            auto-close 
+            class="nav-btn" 
+            :class="{ 'nav-btn-active': activeButton === 'clases' }"
+            :label="$t('clases')"
+          >
             <q-list>
-              <q-item clickable @click="$router.push('/ClasesGrupales')">
-                <q-item-section class="q-tab">Clases grupales</q-item-section>
-              </q-item>
               <q-item clickable @click="$router.push('/ClasesIndividuales')">
-                <q-item-section class="q-tab">Clases individuales</q-item-section>
+                <q-item-section class="text-h6">{{ $t('clasesIndividuales') }}</q-item-section>
               </q-item>
-              <q-item clickable @click="$router.push('/EjerciciosEspañol')">
-                <q-item-section class="q-tab">Ejercicios de español</q-item-section>
+              <q-item clickable @click="$router.push('/ClasesGrupales')">
+                <q-item-section class="text-h6">{{ $t('clasesGrupales') }}</q-item-section>
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-route-tab to="/TestNivel" name="tab2" class="q-tab">Test de nivel</q-route-tab>
-          <q-route-tab to="/sobreSpanish" name="tab3" Class="q-tab">Sobre</q-route-tab>
-          <q-route-tab to="/Contacto" name="tab4" class="q-tab">Contacto</q-route-tab>
-        </q-tabs>
-        <q-space v-if="$q.screen.gt.sm" />
+    
+          <q-btn 
+            flat 
+            :to="'/TestNivel'" 
+            exact 
+            class="nav-btn" 
+            :class="{ 'nav-btn-active': activeButton === 'testNivel' }"
+          >
+            {{ $t('testNivel') }}
+          </q-btn>
+          
+          <q-btn 
+            flat 
+            :to="'/sobreSpanish'" 
+            exact 
+            class="nav-btn" 
+            :class="{ 'nav-btn-active': activeButton === 'sobreSpanish' }"
+          >
+            {{ $t('sobre') }}
+          </q-btn>
+          
+          <q-btn 
+            flat 
+            :to="'/Contacto'" 
+            exact 
+            class="nav-btn" 
+            :class="{ 'nav-btn-active': activeButton === 'contacto' }"
+          >
+            {{ $t('contacto') }}
+          </q-btn>
+        </div>
+        <q-space v-if="$q.screen.gt.sm"/>
       </q-toolbar>
     </q-header>
-    <!-- El sticky debe ir fuera de <q-page-container> y antes del footer -->
-
     <q-drawer v-model="leftDrawerOpen" bordered>
       <q-list>
-        <q-item-label header> Essential Links </q-item-label>
         <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
       </q-list>
     </q-drawer>
@@ -165,58 +205,64 @@
       <div class="row flex q-pa-md">
         <div class="col-12 col-md-3 flex column items-center align-center q-pt-lg">
           <q-img src="/img/Logotexto_500.png" class="img-responsiva" />
-          <h5 class="text-bold items-center q-pa-none q-ma-none">Spanish nook</h5>
+          <h5  class="text-bold items-center q-pa-none q-ma-none">SpanishNook</h5>
         </div>
 
-        <div class="col-12 col-md-3 flex column items-center q-pa-none q-ma-none">
-          <h5 class="text-bold items-left q-pa-none q-ma-none">Spanish nook</h5>
-          <p class="q-ma-md text-subtitle1">
-            Spanish nook es un lugar donde puedes aprender español de manera divertida y efectiva.
-            Ofrecemos clases grupales e individuales, ejercicios interactivos y recursos para
-            mejorar tu nivel de español.
-          </p>
+        <div v-if="$q.screen.gt.sm" class="col-12 col-md-3 flex column items-center q-pa-none q-ma-none">
+          <h5 class="text-bold items-left q-py-none q-mt-none q-mb-md">SpanishNook</h5>
+          <p class="q-mx-md text-body1">{{ $t('footerSpanishnookEs') }}</p>
         </div>
         <!-- Columna Mapa del sitio -->
         <div class="col-12 col-md-3 flex column items-center">
           <div class="text-bold q-mx-xs">
-            <h5 class="text-bold q-pa-none q-ma-none items-center">Mapa del sitio</h5>
+            <h5 class="text-bold q-pa-none q-mt-none q-mb-md items-center">{{ $t('footerMapa') }}</h5>
           </div>
+          <div class="footer-links-container q-px-none q-mx-none">
 
-          <router-link to="/IndexPage" class="footer-link q-mb-xs q-mt-md">Inicio</router-link>
+            <router-link to="/" class="footer-link q-mb-xs ">{{ $t('inicio') }}</router-link>
 
-          <router-link to="/ClasesGrupales" class="footer-link q-mb-xs"
-            >Clases grupales</router-link
-          >
-          <router-link to="/ClasesIndividuales" class="footer-link q-mb-xs"
-            >Clases individuales</router-link
-          >
-          <router-link to="/EjerciciosEspañol" class="footer-link q-mb-xs"
-            >Ejercicios de español</router-link
-          >
-          <router-link to="/TestNivel" class="footer-link q-mb-xs">Test de nivel</router-link>
-          <router-link to="/sobreSpanish" class="footer-link q-mb-xs"
-            >Sobre Spanish Nook</router-link
-          >
-          <router-link to="/Contacto" class="footer-link">Contacto</router-link>
+            <router-link to="/ClasesGrupales" class="footer-link q-mb-xs"
+            >{{ $t('clasesGrupales') }}</router-link>
+            
+            <router-link to="/ClasesIndividuales" class="footer-link q-mb-xs">{{ $t('clasesIndividuales') }}</router-link>
+          
+            <router-link to="/TestNivel" class="footer-link q-mb-xs"
+            >{{ $t('testNivel') }}</router-link>
+          
+            <router-link to="/sobreSpanish" class="footer-link q-mb-xs"
+            >{{ $t('sobre') }}</router-link >
+          
+            <router-link to="/Contacto" class="footer-link">{{ $t('contacto') }}</router-link>
+
+            <router-link to="/Aviso" class="footer-link ">{{ $t('footerAvisoLegal') }}</router-link>
+
+            <router-link to="/Privacidad" class="footer-link "
+            >{{ $t('footerPrivacidad') }}</router-link>
+
+            <router-link to="/Cookies" class="footer-link ">{{ $t('footerCookies') }}</router-link>
+
+            <router-link to="/Condiciones" class="footer-link "
+            >{{ $t('footerCondiciones') }}</router-link>
+          </div>
         </div>
         <!-- Columna Enlaces de interés -->
         <div v-if="$q.screen.gt.sm" class="col-12 col-md-3 flex column">
           <div class="text-bold">
-            <h5 class="text-bold items-center q-ma-none">Enlaces de interes</h5>
+            <h5 class="text-bold items-center q-ma-none">{{ $t('footerEnlacesInteres') }}</h5>
           </div>
           <a
             href="https://www.cervantes.es/"
             target="_blank"
             rel="noopener"
             class="footer-link q-mt-md"
-            >Instituto Cervantes</a
+            >{{ $t('footerInstitutoCervantes') }}</a
           >
           <a href="https://www.rae.es/" target="_blank" rel="noopener" class="footer-link">RAE</a>
           <a href="https://www.dele.org/" target="_blank" rel="noopener" class="footer-link"
             >DELE</a
           >
-          <div class="q-ma-none q-pa-none">
-            <h5 class="text-bold items-center q-pa-none q-my-none">Síguenos en redes sociales</h5>
+          <div class="q-ma-none q-pa-none q-pt-lg">
+            <h5 class="text-bold items-center q-pa-none q-my-none">{{ $t('footerRedes') }}</h5>
             <q-btn
               icon="mdi-facebook"
               size="lg"
@@ -238,50 +284,26 @@
               class="text-primary underline-btn q-sm-mr-lg q-pr-lg"
               href="@paulaspanishnook"
             />
-            <q-btn
-              icon="mdi-youtube"
-              size="lg"
-              flat
-              class="text-primary underline-btn q-sm-mr-lg q-pr-lg"
-              href="@paulaspanishnook"
-            />
-            <q-btn
-              icon="mdi-mail"
-              size="lg"
-              flat
-              class="text-primary underline-btn q-sm-mr-lg q-pr-lg"
-              href="@paulaspanishnook"
-            />
+            
           </div>
         </div>
       </div>
-      <q-bar class="footer-bar">
-        <div class="row flex items-center full-width">
-          <div class="q-mr-lg">© 2025 Spanishnook · Todos los derechos reservados</div>
-          <router-link to="/Aviso" class="q-px-md q-mx-md text-white">Aviso Legal</router-link>
-          <router-link to="/Privacidad" class="q-px-md q-mx-md text-white"
-            >Política de Privacidad</router-link
-          >
-          <router-link to="/Cookies" class="q-px-md q-mx-md text-white"
-            >Política de Cookies</router-link
-          >
-          <router-link to="/Condiciones" class="q-px-md q-mx-md text-white"
-            >Condiciones de Venta</router-link
-          >
-        </div>
+      <q-bar class="q-pa-none q-ma-none">
+          <div class="q-mr-lg">{{ $t('footerDerechosReservados') }}</div>
       </q-bar>
     </q-footer>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
 import { useI18n } from 'vue-i18n';
 import { useAuth } from 'src/stores/auth';
+import { useRoute } from 'vue-router';
 
 const { user } = useAuth();
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 
 // Banner de cookies
 const showCookiesBanner = ref(false);
@@ -322,6 +344,19 @@ const iniciarTemporizadorCarrito = () => {
   }, 1000); // Verificar cada segundo
 };
 
+const activeButton = ref('');
+const route = useRoute();
+
+// Watcher para detectar cambios de ruta
+watch(() => route.path, (newPath) => {
+  if (newPath === '/') activeButton.value = 'inicio';
+  else if (newPath === '/ClasesIndividuales' || newPath === '/ClasesGrupales') activeButton.value = 'clases';
+  else if (newPath === '/TestNivel') activeButton.value = 'test';
+  else if (newPath === '/sobreSpanish') activeButton.value = 'sobre';
+  else if (newPath === '/Contacto') activeButton.value = 'contacto';
+  else activeButton.value = '';
+}, { immediate: true });
+
 onMounted(() => {
   showCookiesBanner.value = localStorage.getItem('cookies_accepted') !== 'true';
   localStorage.removeItem('carritoReservas');
@@ -337,52 +372,44 @@ onUnmounted(() => {
   }
 });
 
-const langOptions = [
-  { label: 'Español', value: 'es' },
-  { label: 'English', value: 'en' },
-];
-
 function changeLang(val: string) {
   locale.value = val;
+  // Aquí puedes añadir lógica adicional para cambiar el idioma
+  // Por ejemplo, actualizar las traducciones de i18n
 }
 
-const linksList: EssentialLinkProps[] = [
+const linksList = computed((): EssentialLinkProps[] => [
   {
-    title: 'Home',
-    icon: 'school',
+    title: t('inicio'),
+    icon: 'home',
     link: '/',
   },
   {
-    title: 'Test de nivel',
+    title: t('testNivel'),
     icon: 'code',
     link: '/TestNivel',
   },
   {
-    title: 'Clases grupales',
-    icon: 'chat',
-    link: '/ClasesGrupales',
-  },
-  {
-    title: 'Clases individuales',
+    title: t('clasesIndividuales'),
     icon: 'record_voice_over',
     link: '/ClasesIndividuales',
   },
   {
-    title: 'Ejercicios de español',
+    title: t('clasesGrupales'),
     icon: 'chat',
-    link: '/EjerciciosEspañol',
+    link: '/ClasesGrupales',
   },
   {
-    title: 'Sobre Spanish Nook',
+    title: t('sobre'),
     icon: 'rss_feed',
     link: '/SobreSpanish',
   },
   {
-    title: 'Contacto',
+    title: t('contacto'),
     icon: 'rss_feed',
     link: '/Contacto',
   },
-];
+]);
 
 const leftDrawerOpen = ref(false);
 
@@ -392,9 +419,205 @@ function toggleLeftDrawer() {
 </script>
 
 <style lang="scss">
-.underline-btn {
+// Botón barra superior
+.btn-barra-superior {
+  font-size: 1.2rem !important;
+  font-weight: 300 !important;
   text-decoration: underline;
+  margin-right: 5%;
+  
+  /* Hacerlo responsivo */
+  @media (max-width: 599px) {
+    font-size: 0.8rem !important;
+  }
+  
+  @media (min-width: 600px) and (max-width: 1023px) {
+    font-size: 1rem !important;
+  }
+  
+  @media (min-width: 1024px) {
+    font-size: 1.2rem !important;
+  }
 }
+
+/* Botón del carrito responsivo */
+.carrito-btn {
+  /* Padding responsivo del botón */
+  @media (min-width: 300px) {
+    padding: 2px;
+    
+    .q-icon {
+      font-size: 1.5rem !important;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    padding: 4px;    
+    .q-icon {
+      font-size: 2rem !important;
+    }
+  }
+  
+  @media (min-width: 1920px) {
+    .q-icon {
+      font-size: 2.2rem !important;
+    }
+  }
+}
+
+/* Badge responsivo */
+.badge-notification {
+  font-size: 8px;
+  padding: 1px 3px;
+  min-width: 14px;
+  height: 14px;
+  top: -3px;
+  right: -3px;
+  
+  @media (min-width: 300px) {
+    font-size: 9px;
+    padding: 2px 4px;
+    min-width: 16px;
+    height: 16px;
+    top: -4px;
+    right: -4px;
+  }
+  
+  @media (min-width: 1024px) {
+    font-size: 10px;
+    padding: 2px 5px;
+    min-width: 18px;
+    height: 18px;
+    top: -5px;
+    right: -5px;
+  }
+}
+
+/* Logo responsivo */
+.logo-responsivo {
+  height: auto;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  
+  /* Móviles pequeños (xs) */
+  width: 50px;  
+  
+  /* Móviles grandes y tablets (sm) */
+  @media (min-width: 600px) and (max-width: 1023px) {
+    width: 55px;
+  }
+  
+  /* Escritorio (md y superior) */
+  @media (min-width: 1024px) {
+    width: 60px;
+  }
+  
+  /* Escritorio grande (xl) */
+  @media (min-width: 1920px) {
+    width: 60px;
+  }
+}
+
+/* Título Spanishnook responsivo */
+.spanishnook-title {
+  font-weight: bold !important;
+  margin-left: 8px;
+  
+  /* Móviles pequeños */
+  font-size: 1.4rem !important;
+  
+  /* Móviles grandes y tablets */
+  @media (min-width: 600px) and (max-width: 1023px) {
+    font-size: 1.8rem !important;
+  }
+  
+  /* Escritorio pequeño */
+  @media (min-width: 1024px) and (max-width: 1439px) {
+    font-size: 2rem !important;
+  }
+  
+  /* Escritorio grande */
+  @media (min-width: 1440px) {
+    font-size: 2.2rem !important;
+  }
+  
+  /* Escritorio extra grande */
+  @media (min-width: 1920px) {
+    font-size: 2.5rem !important;
+  }
+}
+
+/* Botón de navegación con mayor especificidad */
+.nav-btn {
+  font-weight: 500 !important;
+  color: white !important;
+  padding: 8px 16px !important;
+  transition: all 0.8s ease;
+  
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    transform: scale(1.1);
+  }
+
+   @media (min-width: 600px) and (max-width: 1023px) {
+    font-size: 0.9rem !important;
+  }
+  
+  @media (min-width: 1024px) {
+    font-size: 1rem !important;
+  }
+  
+  @media (min-width: 1440px) {
+    font-size: 1.2rem !important;
+  }
+}
+  
+.q-btn.nav-btn.nav-btn-active {
+  font-weight: 800 !important;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background-color: white;
+    border-radius: 1px;
+  }
+}
+ 
+/* Contenedor de navegación centrado */
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 46px; /* Espaciado entre botones */
+  
+  @media (min-width: 600px) and (max-width: 1023px) {
+    gap: 12px;
+  }
+  
+  @media (min-width: 1024px) {
+    gap: 20px;
+  }
+  
+  @media (min-width: 1440px) {
+    gap: 24px;
+  }
+}  
+  
+
+/* También para el dropdown de Clases */
+.q-btn-dropdown.nav-btn.router-link-active .q-btn__content {
+  text-decoration: underline !important;
+  text-underline-offset: 4px !important;
+}
+
 
 .img-responsiva {
   width: 100%;
@@ -402,20 +625,23 @@ function toggleLeftDrawer() {
   max-width: 200px;
   max-height: 200px;
 }
+
 .footer-link {
   color: white !important;
   font-weight: bold;
   text-decoration: none !important;
   display: inline-block;
-}
-.footer-link:hover {
-  color: #de1212 !important;
-  transform: translateX(8px);
+  
+  &:hover {
+    color: #de1212 !important;
+    transform: translateX(8px);
+  }
 }
 
 .footer-bar {
   min-height: 48px;
   font-size: 1.1rem;
+  margin-top: 16px;
 }
 
 .whatsapp-sticky-btn {
@@ -427,28 +653,138 @@ function toggleLeftDrawer() {
   }
 }
 
-/*.q-tab {
-  font-size: 1.3rem !important;
-  font-weight: medium !important;
-  transition: font-size 0.4s;
-  margin-left: 15px;
-  margin-right: 15px;
-}
-.q-tab:hover {
-  font-size: 1.6rem !important;
-} */
-
-/* Estilos para la notificación del carrito */
-.badge-notification {
-  font-size: 10px;
-  padding: 2px 5px;
-  min-width: 16px;
-  height: 16px;
-  top: -4px;
-  right: -4px;
+/* Estilos para las banderas */
+.flag-selected {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 2px solid #fff;
 }
 
-.relative-position {
+.flag-unselected {
+  opacity: 0.7;
+  border: 2px solid transparent;
+  
+  &:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.carrito {
   position: relative;
 }
+
+/* Contenedor de banderas responsivo */
+.flags-container {
+  gap: 4px;
+  
+  @media (min-width: 600px) {
+    gap: 8px;
+  }
+  
+  @media (min-width: 1024px) {
+    gap: 12px;
+  }
+}
+
+/* Botones de banderas responsivos */
+.flag-btn {
+  margin: 0 2px;
+  
+  @media (max-width: 599px) {
+    margin: 0 4px;
+    padding: 2px;
+  }
+  
+  @media (min-width: 600px) and (max-width: 1023px) {
+    margin: 0 8px;
+    padding: 4px;
+  }
+  
+  @media (min-width: 1024px) {
+    margin: 0 12px;
+    padding: 6px;
+  }
+  
+  @media (min-width: 1920px) {
+    margin: 0 16px;
+    padding: 8px;
+  }
+}
+
+.flag-es {
+  @media (max-width: 599px) {
+    margin-left: 8px;
+  }
+  
+  @media (min-width: 600px) {
+    margin-left: 16px;
+  }
+  
+  @media (min-width: 1024px) {
+    margin-left: 24px;
+  }
+}
+
+.flag-en {
+  @media (max-width: 599px) {
+    margin-right: 8px;
+  }
+  
+  @media (min-width: 600px) {
+    margin-right: 16px;
+  }
+  
+  @media (min-width: 1024px) {
+    margin-right: 24px;
+  }
+}
+
+/* Contenedor de links del footer */
+.footer-links-container {
+  display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+    width: 100%;
+    max-width: 300px;
+
+  /* Móviles: dos columnas */
+  @media (max-width: 599px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 32px;
+    width: 100%;
+    max-width: 300px;
+    
+    .footer-link {
+      
+      font-size: 0.9rem !important;
+      padding: 4px 8px;
+    }
+  }
+
+  
+}
+
+.footer-link {
+  color: white !important;
+  font-weight: bold;
+  text-decoration: none !important;
+  display: inline-block;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  
+  &:hover {
+    color: #de1212 !important;
+    transform: translateX(8px);
+  }
+  
+  /* Responsivo */
+  @media (max-width: 599px) {
+    &:hover {
+      transform: scale(1.05); /* En móvil, solo escalar en lugar de mover */
+    }
+  }
+}
+
 </style>
+
