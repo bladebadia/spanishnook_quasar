@@ -7,7 +7,7 @@
         <q-space></q-space>
         <!-- Boton Area Personal -->
         <q-btn to="/AreaPersonal" v-if="user" flat 
-          class="text-white btn-barra-superior"
+          class="text-white btn-nav-superior"
       
           >{{ $t('areaPersonal') }}
         </q-btn>
@@ -15,14 +15,16 @@
         <q-btn
           to="/Acceder"
           v-if="!user"
-          class="text-white btn-barra-superior"
+          flat
+          class="text-white btn-nav-superior"
           >{{ $t('acceder') }}
         </q-btn>
         <q-btn
           to="/CarritoCompra"
           v-if="user"         
-          class="text-white carrito-btn"
+          class="text-white carro-btn"
           icon="shopping_cart"
+          flat
         >
           <q-badge v-if="carritoCount > 0" color="red" floating rounded class="badge-notification">
             {{ carritoCount }}
@@ -74,7 +76,7 @@
           class="logo-responsivo"        
          
         />
-        <q-toolbar-title class="spanishnook-title"> Spanishnook </q-toolbar-title>
+        <q-toolbar-title class="spanishnook-titl"> SpanishNook </q-toolbar-title>
         <q-space v-if="$q.screen.gt.sm"/>
         <!-- Navegación con botones -->
         <div class=" nav-container  " v-if="$q.screen.gt.sm">
@@ -82,8 +84,8 @@
             flat 
             :to="'/'" 
             exact 
-            class="nav-btn"
-            :class="{ 'nav-btn-active': activeButton === 'inicio' }"            
+            class="nave-btn"
+            :class="{ 'nave-btn-active': activeButton === 'inicio' }"            
           >
             {{ $t('inicio') }}
           </q-btn>
@@ -91,8 +93,8 @@
           <q-btn-dropdown 
             flat 
             auto-close 
-            class="nav-btn" 
-            :class="{ 'nav-btn-active': activeButton === 'clases' }"
+            class="nave-btn" 
+            :class="{ 'nave-btn-active': activeButton === 'clases' }"
             :label="$t('clases')"
           >
             <q-list>
@@ -109,8 +111,8 @@
             flat 
             :to="'/TestNivel'" 
             exact 
-            class="nav-btn" 
-            :class="{ 'nav-btn-active': activeButton === 'testNivel' }"
+            class="nave-btn" 
+            :class="{ 'nave-btn-active': activeButton === 'testNivel' }"
           >
             {{ $t('testNivel') }}
           </q-btn>
@@ -119,8 +121,8 @@
             flat 
             :to="'/sobreSpanish'" 
             exact 
-            class="nav-btn" 
-            :class="{ 'nav-btn-active': activeButton === 'sobreSpanish' }"
+            class="nave-btn" 
+            :class="{ 'nave-btn-active': activeButton === 'sobreSpanish' }"
           >
             {{ $t('sobre') }}
           </q-btn>
@@ -129,8 +131,8 @@
             flat 
             :to="'/Contacto'" 
             exact 
-            class="nav-btn" 
-            :class="{ 'nav-btn-active': activeButton === 'contacto' }"
+            class="nave-btn" 
+            :class="{ 'nave-btn-active': activeButton === 'contacto' }"
           >
             {{ $t('contacto') }}
           </q-btn>
@@ -204,65 +206,65 @@
     <q-footer class="bg-black text-white">
       <div class="row flex q-pa-md">
         <div class="col-12 col-md-3 flex column items-center align-center q-pt-lg">
-          <q-img src="/img/Logotexto_500.png" class="img-responsiva" />
-          <h5  class="text-bold items-center q-pa-none q-ma-none">SpanishNook</h5>
+          <q-img src="/img/Logotexto_500.png" class="img-responsiv" />
+          <p  class="text-bold items-center footer-titulo q-pa-none q-ma-none">SpanishNook</p>
         </div>
 
         <div v-if="$q.screen.gt.sm" class="col-12 col-md-3 flex column items-center q-pa-none q-ma-none">
-          <h5 class="text-bold items-left q-py-none q-mt-none q-mb-md">SpanishNook</h5>
-          <p class="q-mx-md text-body1">{{ $t('footerSpanishnookEs') }}</p>
+          <p class="text-bold footer-titulo q-py-none q-mt-none q-mb-md">SpanishNook</p>
+          <p class="q-mx-md text-body2">{{ $t('footerSpanishnookEs') }}</p>
         </div>
         <!-- Columna Mapa del sitio -->
         <div class="col-12 col-md-3 flex column items-center">
           <div class="text-bold q-mx-xs">
-            <h5 class="text-bold q-pa-none q-mt-none q-mb-md items-center">{{ $t('footerMapa') }}</h5>
+            <p class="text-bold footer-titulo items-center">{{ $t('footerMapa') }}</p>
           </div>
           <div class="footer-links-container q-px-none q-mx-none">
 
-            <router-link to="/" class="footer-link q-mb-xs ">{{ $t('inicio') }}</router-link>
+            <router-link to="/" class="foot-link ">{{ $t('inicio') }}</router-link>
 
-            <router-link to="/ClasesGrupales" class="footer-link q-mb-xs"
+            <router-link to="/ClasesGrupales" class="foot-link "
             >{{ $t('clasesGrupales') }}</router-link>
             
-            <router-link to="/ClasesIndividuales" class="footer-link q-mb-xs">{{ $t('clasesIndividuales') }}</router-link>
+            <router-link to="/ClasesIndividuales" class="foot-link ">{{ $t('clasesIndividuales') }}</router-link>
           
-            <router-link to="/TestNivel" class="footer-link q-mb-xs"
+            <router-link to="/TestNivel" class="foot-link"
             >{{ $t('testNivel') }}</router-link>
           
-            <router-link to="/sobreSpanish" class="footer-link q-mb-xs"
+            <router-link to="/sobreSpanish" class="foot-link "
             >{{ $t('sobre') }}</router-link >
-          
-            <router-link to="/Contacto" class="footer-link">{{ $t('contacto') }}</router-link>
 
-            <router-link to="/Aviso" class="footer-link ">{{ $t('footerAvisoLegal') }}</router-link>
+            <router-link to="/Contacto" class="foot-link">{{ $t('contacto') }}</router-link>
 
-            <router-link to="/Privacidad" class="footer-link "
+            <router-link to="/Aviso" class="foot-link">{{ $t('footerAvisoLegal') }}</router-link>
+
+            <router-link to="/Privacidad" class="foot-link"
             >{{ $t('footerPrivacidad') }}</router-link>
 
-            <router-link to="/Cookies" class="footer-link ">{{ $t('footerCookies') }}</router-link>
+            <router-link to="/Cookies" class="foot-link">{{ $t('footerCookies') }}</router-link>
 
-            <router-link to="/Condiciones" class="footer-link "
+            <router-link to="/Condiciones" class="foot-link"
             >{{ $t('footerCondiciones') }}</router-link>
           </div>
         </div>
         <!-- Columna Enlaces de interés -->
         <div v-if="$q.screen.gt.sm" class="col-12 col-md-3 flex column">
-          <div class="text-bold">
-            <h5 class="text-bold items-center q-ma-none">{{ $t('footerEnlacesInteres') }}</h5>
+          <div c>
+            <p class="text-bold items-center footer-titulo q-ma-none">{{ $t('footerEnlacesInteres') }}</p>
           </div>
           <a
             href="https://www.cervantes.es/"
             target="_blank"
             rel="noopener"
-            class="footer-link q-mt-md"
+            class="foot-link q-mt-md"
             >{{ $t('footerInstitutoCervantes') }}</a
           >
-          <a href="https://www.rae.es/" target="_blank" rel="noopener" class="footer-link">RAE</a>
-          <a href="https://www.dele.org/" target="_blank" rel="noopener" class="footer-link"
+          <a href="https://www.rae.es/" target="_blank" rel="noopener" class="foot-link">RAE</a>
+          <a href="https://www.dele.org/" target="_blank" rel="noopener" class="foot-link"
             >DELE</a
           >
           <div class="q-ma-none q-pa-none q-pt-lg">
-            <h5 class="text-bold items-center q-pa-none q-my-none">{{ $t('footerRedes') }}</h5>
+            <p class="text-bold footer-titulo items-center q-pa-none q-my-none">{{ $t('footerRedes') }}</p>
             <q-btn
               icon="mdi-facebook"
               size="lg"
@@ -289,7 +291,7 @@
         </div>
       </div>
       <q-bar class="q-pa-none q-ma-none">
-          <div class="q-mr-lg">{{ $t('footerDerechosReservados') }}</div>
+          <div class="foot-link q-mr-lg q-mb-xs">{{ $t('footerDerechosReservados') }}</div>
       </q-bar>
     </q-footer>
   </q-layout>
@@ -420,47 +422,35 @@ function toggleLeftDrawer() {
 
 <style lang="scss">
 // Botón barra superior
-.btn-barra-superior {
-  font-size: 1.2rem !important;
+.btn-nav-superior {
+  font-size: 0.8rem !important;
   font-weight: 300 !important;
   text-decoration: underline;
-  margin-right: 5%;
-  
-  /* Hacerlo responsivo */
-  @media (max-width: 599px) {
-    font-size: 0.8rem !important;
-  }
-  
-  @media (min-width: 600px) and (max-width: 1023px) {
-    font-size: 1rem !important;
-  }
+  margin-right: 5%;  
   
   @media (min-width: 1024px) {
-    font-size: 1.2rem !important;
+    font-size: 1rem !important;
   }
 }
 
 /* Botón del carrito responsivo */
-.carrito-btn {
-  /* Padding responsivo del botón */
-  @media (min-width: 300px) {
-    padding: 2px;
-    
-    .q-icon {
-      font-size: 1.5rem !important;
-    }
-  }
-  
-  @media (min-width: 1024px) {
-    padding: 4px;    
+.carro-btn { 
+    padding: 2px;    
     .q-icon {
       font-size: 2rem !important;
     }
-  }
+
+  /* Padding responsivo del botón */
+  @media (min-width: 300px) {
+    padding: 2px;    
+    .q-icon {
+      font-size: 1.5rem !important;
+    }
+  }  
   
   @media (min-width: 1920px) {
     .q-icon {
-      font-size: 2.2rem !important;
+      font-size: 2rem !important;
     }
   }
 }
@@ -518,38 +508,31 @@ function toggleLeftDrawer() {
     width: 60px;
   }
 }
-
 /* Título Spanishnook responsivo */
-.spanishnook-title {
+.spanishnook-titl {
   font-weight: bold !important;
   margin-left: 8px;
   
   /* Móviles pequeños */
-  font-size: 1.4rem !important;
+  font-size: 1.2rem !important;
   
   /* Móviles grandes y tablets */
   @media (min-width: 600px) and (max-width: 1023px) {
-    font-size: 1.8rem !important;
+    font-size: 1.3rem !important;
   }
   
   /* Escritorio pequeño */
   @media (min-width: 1024px) and (max-width: 1439px) {
-    font-size: 2rem !important;
+    font-size: 1.5rem !important;
   }
   
-  /* Escritorio grande */
-  @media (min-width: 1440px) {
-    font-size: 2.2rem !important;
-  }
   
-  /* Escritorio extra grande */
-  @media (min-width: 1920px) {
-    font-size: 2.5rem !important;
-  }
+  
 }
 
+
 /* Botón de navegación con mayor especificidad */
-.nav-btn {
+.nave-btn {
   font-weight: 500 !important;
   color: white !important;
   padding: 8px 16px !important;
@@ -562,7 +545,7 @@ function toggleLeftDrawer() {
   }
 
    @media (min-width: 600px) and (max-width: 1023px) {
-    font-size: 0.9rem !important;
+    font-size: 0.8rem !important;
   }
   
   @media (min-width: 1024px) {
@@ -570,11 +553,11 @@ function toggleLeftDrawer() {
   }
   
   @media (min-width: 1440px) {
-    font-size: 1.2rem !important;
+    font-size: 1rem !important;
   }
 }
   
-.q-btn.nav-btn.nav-btn-active {
+.q-btn.nave-btn.nave-btn-active {
   font-weight: 800 !important;
   position: relative;
   
@@ -619,11 +602,11 @@ function toggleLeftDrawer() {
 }
 
 
-.img-responsiva {
+.img-responsiv {
   width: 100%;
   height: auto;
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 150px;
+  max-height: 150px;
 }
 
 .footer-link {
@@ -739,11 +722,30 @@ function toggleLeftDrawer() {
   }
 }
 
+.footer-titulo {
+  font-weight: bold !important;
+  font-size: 1rem !important;
+  
+  
+  @media (max-width: 599px) {
+    font-size: 1rem !important;
+    margin-top: 20px;
+  }
+  
+  @media (min-width: 600px) and (max-width: 1023px) {
+    font-size: 1rem !important;
+  }
+  
+  @media (min-width: 1024px) {
+    font-size: 1rem !important;
+  }
+}
+
 /* Contenedor de links del footer */
 .footer-links-container {
   display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px 32px;
+    gap: 2px 32px;
     width: 100%;
     max-width: 300px;
 
@@ -765,13 +767,16 @@ function toggleLeftDrawer() {
   
 }
 
-.footer-link {
+.foot-link {
   color: white !important;
   font-weight: bold;
   text-decoration: none !important;
   display: inline-block;
   transition: all 0.3s ease;
   border-radius: 4px;
+  font-size: 0.8rem !important;
+  padding: 0px 0px;
+  margin: 0px 0;
   
   &:hover {
     color: #de1212 !important;
@@ -780,8 +785,10 @@ function toggleLeftDrawer() {
   
   /* Responsivo */
   @media (max-width: 599px) {
+    font-size: 0.8rem !important;
     &:hover {
       transform: scale(1.05); /* En móvil, solo escalar en lugar de mover */
+
     }
   }
 }
