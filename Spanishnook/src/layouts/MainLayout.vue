@@ -616,7 +616,6 @@ function toggleLeftDrawer() {
   display: inline-block;
   
   &:hover {
-    color: #de1212 !important;
     transform: translateX(8px);
   }
 }
@@ -779,7 +778,6 @@ function toggleLeftDrawer() {
   margin: 0px 0;
   
   &:hover {
-    color: #de1212 !important;
     transform: translateX(8px);
   }
   
