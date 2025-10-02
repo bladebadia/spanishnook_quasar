@@ -19,6 +19,10 @@
                 <q-item-label>
                   {{ formatFecha(reserva.fecha) }} a las {{ reserva.hora }}
                 </q-item-label>
+                <q-item-label caption>
+                  {{ reserva.tipo === 'normal' ? 'Clase Normal' : 'Clase Conversación' }} -
+                  {{ reserva.tipo === 'normal' ? '32€' : '20€' }}
+                </q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-btn
@@ -40,18 +44,30 @@
         <div class="q-mt-lg">
           <h5>Mis Reservas Confirmadas</h5>
           <q-list bordered v-if="misReservas.length > 0">
-            <q-item v-for="reserva in misReservas" :key="reserva.id">
+            <q-item v-for="reserva in misReservas" :key="reserva.id" class="q-mb-sm">
               <q-item-section>
                 <q-item-label>
-                  {{ formatFecha(reserva.fecha) }} a las {{ reserva.hora }}
+                  {{ formatFecha(reserva.fecha) }} a las {{ reserva.hora.slice(0, 5) }}
+                </q-item-label>
+                <q-item-label caption>
+                  {{ getTipoClaseTexto(reserva) }} - {{ getPrecioClase(reserva) }}€
+                </q-item-label>
+                <q-item-label caption v-if="!puedeCancelar(reserva)" class="text-negative">
+                  No se puede cancelar (menos de 72 horas)
                 </q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-btn
                   color="negative"
                   icon="delete"
-                  @click="cancelarReserva(reserva.id)"
+                  @click="cancelarReserva(reserva)"
                   size="sm"
+                  :disable="!puedeCancelar(reserva)"
+                  :title="
+                    !puedeCancelar(reserva)
+                      ? 'No se puede cancelar con menos de 72 horas de antelación'
+                      : 'Cancelar reserva'
+                  "
                 />
               </q-item-section>
             </q-item>
@@ -60,8 +76,28 @@
         </div>
       </div>
 
-      <!-- Columna derecha: Calendario + Horarios -->
-      <div class="col-12 col-md-7">
+      <!-- Columna derecha: Selector + Calendario + Horarios -->
+      <div class="col-12 col-md-6">
+        <div class="q-mb-md">
+          <q-card class="q-pa-md shadow-1 rounded-borders">
+            <q-card-section class="q-pa-sm">
+              <div class="text-h6 text-center q-mb-md">Tipo de Clase</div>
+              <q-option-group
+                v-model="tipoClase"
+                :options="opcionesTipoClase"
+                color="primary"
+                inline
+                class="justify-center"
+              />
+              <div class="text-center q-mt-sm">
+                <q-badge color="primary" class="q-px-sm q-py-xs text-subtitle1">
+                  Precio: {{ tipoClase === 'normal' ? '32€' : '20€' }}
+                </q-badge>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
+
         <!-- Calendario -->
         <div class="q-mb-xl">
           <q-date
@@ -115,6 +151,7 @@ interface ReservaCarrito {
   id?: string;
   fecha: string;
   hora: string;
+  tipo: 'normal' | 'conversacion'; // Añadir tipo
 }
 
 interface ReservaConfirmada {
@@ -124,6 +161,8 @@ interface ReservaConfirmada {
   hora: string;
   estado: string;
   created_at?: string;
+  tipo?: 'normal' | 'conversacion';
+  precio?: number;
 }
 
 const { user } = useAuth();
@@ -132,6 +171,19 @@ const fechaSeleccionada = ref('');
 const horasOcupadas = ref<string[]>([]);
 const misReservas = ref<ReservaConfirmada[]>([]);
 const carrito = ref<ReservaCarrito[]>([]);
+const tipoClase = ref<'normal' | 'conversacion'>('normal');
+
+// Opciones para el selector de tipo de clase
+const opcionesTipoClase = [
+  {
+    label: 'Clase Normal (32€)',
+    value: 'normal',
+  },
+  {
+    label: 'Clase Conversación (20€)',
+    value: 'conversacion',
+  },
+];
 
 // Fechas mínima y máxima (3 meses vista)
 const fechaMinima = new Date().toISOString().split('T')[0];
@@ -185,6 +237,16 @@ const opcionesFechas = (date: string) => {
 
   const day = selectedDate.getDay();
   return day !== 0 && day !== 6; // Excluir fines de semana
+};
+
+// Función para obtener el texto del tipo de clase
+const getTipoClaseTexto = (reserva: ReservaConfirmada): string => {
+  return reserva.tipo === 'normal' ? 'Clase Normal' : 'Clase Conversación';
+};
+
+// Función para obtener el precio
+const getPrecioClase = (reserva: ReservaConfirmada): number => {
+  return reserva.tipo === 'normal' ? 32 : 20;
 };
 
 // Formatear fecha en español
@@ -248,6 +310,7 @@ const agregarAlCarrito = (hora: string) => {
   carrito.value.push({
     fecha: fechaSeleccionada.value,
     hora: hora,
+    tipo: tipoClase.value, // Guardar el tipo seleccionado
   });
 
   guardarCarrito();
@@ -258,7 +321,7 @@ const quitarDelCarrito = async (index: number) => {
   if (index < 0 || index >= carrito.value.length) return;
 
   const reserva: ReservaCarrito | undefined = carrito.value[index];
-  if (!reserva) return; // aquí TS ya sabe que no puede ser undefined
+  if (!reserva) return;
 
   carrito.value.splice(index, 1);
   guardarCarrito();
@@ -307,37 +370,86 @@ const cargarMisReservas = async () => {
   }
 };
 
+// Función para verificar si se puede cancelar una reserva
+const puedeCancelar = (reserva: ReservaConfirmada): boolean => {
+  const fechaReserva = new Date(reserva.fecha + 'T' + reserva.hora);
+  const ahora = new Date();
+  const diferenciaHoras = (fechaReserva.getTime() - ahora.getTime()) / (1000 * 60 * 60);
+  return diferenciaHoras >= 72;
+};
+
 // Cancelar reserva con confirmación + Stripe refund
-const cancelarReserva = (reservaId: string) => {
+const cancelarReserva = (reserva: ReservaConfirmada) => {
+  // Validar 72 horas en el frontend primero
+  const fechaReserva = new Date(reserva.fecha + 'T' + reserva.hora);
+  const ahora = new Date();
+  const diferenciaHoras = (fechaReserva.getTime() - ahora.getTime()) / (1000 * 60 * 60);
+
+  console.log('⏰ Validación frontend - Diferencia en horas:', diferenciaHoras);
+
+  if (diferenciaHoras < 72) {
+    const horasRestantes = Math.max(0, Math.floor(diferenciaHoras));
+    $q.notify({
+      type: 'negative',
+      message: `No puedes cancelar con menos de 72 horas de antelación`,
+      caption: `Tiempo restante: ${horasRestantes} horas`,
+      timeout: 6000,
+      actions: [{ icon: 'close', color: 'white' }],
+    });
+    return; // Detener la ejecución aquí
+  }
+
   $q.dialog({
     title: 'Cancelar reserva',
-    message: '¿Estás seguro de que quieres cancelar esta reserva? Se hará un reembolso en Stripe.',
+    message: `¿Estás seguro de que quieres cancelar la reserva del ${formatFecha(reserva.fecha)} a las ${reserva.hora.slice(0, 5)}? Se procesará un reembolso.`,
     cancel: true,
     persistent: true,
   }).onOk(() => {
     void (async () => {
       try {
-        const { error } = await supabase.functions.invoke('cancel-reserva', {
-          body: { reservaId },
+        console.log('🔄 Enviando solicitud de cancelación para reserva:', reserva.id);
+
+        const { data, error } = await supabase.functions.invoke('cancel-reserva', {
+          body: { reservaId: reserva.id },
         });
 
-        if (error) throw error;
+        console.log('📨 Respuesta recibida:', { data, error });
 
-        misReservas.value = misReservas.value.filter((r) => r.id !== reservaId);
+        if (error) {
+          throw new Error(error.message || 'Error desconocido en la función');
+        }
 
+        if (data?.error) {
+          throw new Error(data.error);
+        }
+
+        // Actualizar la lista local
+        misReservas.value = misReservas.value.filter((r) => r.id !== reserva.id);
+
+        // Recargar disponibilidad
         if (fechaSeleccionada.value) {
           await cargarHorariosOcupados(fechaSeleccionada.value);
         }
 
         $q.notify({
           type: 'positive',
-          message: 'Reserva cancelada y reembolso realizado con éxito',
+          message: data?.message || 'Reserva cancelada y reembolso realizado con éxito',
+          timeout: 5000,
         });
-      } catch (err) {
-        console.error('Error cancelando reserva:', err);
+      } catch (err: unknown) {
+        console.error('💥 Error cancelando reserva:', err);
+        let errorMessage = 'Error al cancelar la reserva';
+
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        } else if (typeof err === 'string') {
+          errorMessage = err;
+        }
+
         $q.notify({
           type: 'negative',
-          message: 'Error al cancelar la reserva o procesar el reembolso',
+          message: errorMessage,
+          timeout: 6000,
         });
       }
     })();

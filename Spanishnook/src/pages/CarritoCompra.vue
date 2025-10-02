@@ -26,6 +26,10 @@
             <q-item-label class="text-h6" :class="{ 'text-white': esReservaConflictiva(reserva) }">
               {{ formatFecha(reserva.fecha) }} a las {{ reserva.hora }}
             </q-item-label>
+            <q-item-label caption :class="{ 'text-white': esReservaConflictiva(reserva) }">
+              {{ reserva.tipo === 'normal' ? 'Clase Normal' : 'Clase Conversación' }} -
+              {{ reserva.tipo === 'normal' ? '32€' : '20€' }}
+            </q-item-label>
             <q-item-label v-if="esReservaConflictiva(reserva)" class="text-white">
               ⚠️ Esta hora ya está ocupada
             </q-item-label>
@@ -50,6 +54,9 @@
         <div class="row justify-between items-center">
           <span>{{ carrito.length }} reserva(s)</span>
           <span class="text-h6 text-primary">Total: {{ total }}€</span>
+        </div>
+        <div class="text-caption text-grey-7 q-mt-xs">
+          {{ totalNormal }} clase(s) normal(es) + {{ totalConversacion }} clase(s) conversación
         </div>
         <div v-if="reservasConflictivas.length > 0" class="text-negative q-mt-sm">
           ⚠️ {{ reservasConflictivas.length }} reserva(s) no disponible(s)
@@ -100,9 +107,11 @@ import { useAuth } from 'src/stores/auth';
 
 const { user } = useAuth();
 
+// ACTUALIZAR la interfaz para incluir el tipo
 interface ReservaCarrito {
   fecha: string;
   hora: string;
+  tipo: 'normal' | 'conversacion'; // ← AÑADIR ESTO
 }
 
 const carrito = ref<ReservaCarrito[]>([]);
@@ -111,7 +120,22 @@ const reservasConflictivas = ref<ReservaCarrito[]>([]);
 
 // Computed properties
 const usuarioLogueado = computed(() => !!user.value?.id);
-const total = computed(() => carrito.value.length * 25); // 25€ por reserva
+
+// Calcular total basado en el tipo de cada reserva
+const total = computed(() => {
+  return carrito.value.reduce((sum, reserva) => {
+    return sum + (reserva.tipo === 'normal' ? 32 : 20);
+  }, 0);
+});
+
+// Contadores por tipo
+const totalNormal = computed(() => {
+  return carrito.value.filter((reserva) => reserva.tipo === 'normal').length;
+});
+
+const totalConversacion = computed(() => {
+  return carrito.value.filter((reserva) => reserva.tipo === 'conversacion').length;
+});
 
 // Verificar si una reserva es conflictiva
 const esReservaConflictiva = (reserva: ReservaCarrito) => {
@@ -120,7 +144,7 @@ const esReservaConflictiva = (reserva: ReservaCarrito) => {
   );
 };
 
-// Cargar carrito desde sessionStorage
+// Cargar carrito desde localStorage
 const cargarCarrito = () => {
   const carritoGuardado = localStorage.getItem('carritoReservas');
   if (carritoGuardado) {
@@ -133,7 +157,7 @@ const cargarCarrito = () => {
   }
 };
 
-// Guardar carrito en sessionStorage
+// Guardar carrito en localStorage
 const guardarCarrito = () => {
   localStorage.setItem('carritoReservas', JSON.stringify(carrito.value));
 };
@@ -207,16 +231,24 @@ const confirmarReservas = async () => {
   confirmando.value = true;
 
   try {
+    // CREAR line_items con precios diferentes según el tipo
     const line_items = carrito.value.map((reserva) => ({
       price_data: {
         currency: 'eur',
-        product_data: { name: `Reserva clase español ${reserva.fecha} ${reserva.hora}` },
-        unit_amount: 25 * 100,
+        product_data: {
+          name: `${reserva.tipo === 'normal' ? 'Clase Normal' : 'Clase Conversación'} - ${reserva.fecha} ${reserva.hora}`,
+        },
+        unit_amount: reserva.tipo === 'normal' ? 3200 : 2000, // 32€ o 20€ en centavos
       },
       quantity: 1,
     }));
 
-    const reservasMetadata = carrito.value.map((r) => ({ fecha: r.fecha, hora: r.hora }));
+    // Incluir el tipo en el metadata para futuras referencias
+    const reservasMetadata = carrito.value.map((r) => ({
+      fecha: r.fecha,
+      hora: r.hora,
+      tipo: r.tipo, // ← INCLUIR EL TIPO EN METADATA
+    }));
 
     const {
       data: { session },
@@ -229,7 +261,11 @@ const confirmarReservas = async () => {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ line_items, reservas: reservasMetadata, user_id: user.value!.id }),
+        body: JSON.stringify({
+          line_items,
+          reservas: reservasMetadata,
+          user_id: user.value!.id,
+        }),
       },
     );
 
