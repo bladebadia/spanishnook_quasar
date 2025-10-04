@@ -348,6 +348,7 @@ const cargarCarrito = () => {
 // Cargar mis reservas confirmadas
 const cargarMisReservas = async () => {
   if (!user.value?.id) {
+    console.log('❌ No hay usuario logueado');
     misReservas.value = [];
     return;
   }
@@ -362,10 +363,15 @@ const cargarMisReservas = async () => {
       .order('fecha', { ascending: true })
       .order('hora', { ascending: true });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Error cargando reservas:', error);
+      return;
+    }
+
+    console.log('✅ Reservas cargadas desde BD:', data);
     misReservas.value = data || [];
   } catch (error) {
-    console.error('Error cargando reservas:', error);
+    console.error('💥 Error cargando reservas:', error);
     misReservas.value = [];
   }
 };
