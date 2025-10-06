@@ -58,7 +58,7 @@ export default defineConfig((ctx) => {
       // ignorePublicFolder: true,
       // minify: false,
       // polyfillModulePreload: true,
-      // distDir
+      distDir: 'dist/ssr',
 
       // Configuración específica para contenedores Docker
       extendViteConf(viteConf) {

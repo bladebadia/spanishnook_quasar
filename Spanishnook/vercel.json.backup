@@ -3,16 +3,25 @@
   "builds": [
     {
       "src": "api/index.mjs",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": "dist/ssr/**"
-      }
+      "use": "@vercel/node"
     }
   ],
   "rewrites": [
     {
       "source": "/client/(.*)",
       "destination": "/dist/ssr/client/$1"
+    },
+    {
+      "source": "/assets/(.*)",
+      "destination": "/dist/ssr/client/assets/$1"
+    },
+    {
+      "source": "/icons/(.*)",
+      "destination": "/dist/ssr/client/icons/$1"
+    },
+    {
+      "source": "/img/(.*)",
+      "destination": "/dist/ssr/client/img/$1"
     },
     {
       "source": "/(.*)",
@@ -26,11 +35,28 @@
         {
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://vitals.vercel-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https: wss:; media-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self';"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     }
   ],
-  "buildCommand": "npm run build:ssr",
+  "buildCommand": "quasar build -m ssr",
   "outputDirectory": "dist/ssr",
   "installCommand": "npm ci"
 }

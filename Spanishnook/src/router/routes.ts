@@ -102,14 +102,14 @@ const routes: RouteRecordRaw[] = [
     path: '/TestNivel',
     component: () => import('pages/TestNivel.vue'),
     meta: { layout: 'empty' },
-  },
+  }
   // Always leave this as last one,
   // but you can also remove it
-  {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
-    meta: { layout: 'empty' },
-  },
+  //{
+  //  path: '/:catchAll(.*)',
+  //  component: () => import('pages/ErrorNotFound.vue'),
+  //  meta: { layout: 'empty' },
+  //},
 ];
 
 export default routes;

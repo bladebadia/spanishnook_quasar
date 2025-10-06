@@ -16,10 +16,21 @@
     font-weight: bold;
     margin: 0 20px;
   }
+  .subtitulo2-responsivo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 20px;
+  }
 
 /* Texto principal responsivo */
     .texto-responsivo {
         font-size: 1.4rem;
+        margin: 0 50px;
+    }
+
+/* Texto principal responsivo */
+    .texto2-responsivo {
+        font-size: 1.2rem;
         margin: 0 50px;
     }
 
@@ -44,7 +55,16 @@
             font-size: 1.1rem;
         }
 
+        .subtitulo2-responsivo {
+            font-size: 1.1rem;
+        }
+
         .texto-responsivo {
+            font-size: 1rem;
+            margin: 0 30px;
+        }
+
+        .texto2-responsivo {
             font-size: 1rem;
             margin: 0 30px;
         }
@@ -61,7 +81,16 @@
             font-size: 1rem;
             font-weight: bold;
         }
+
+        .subtitulo2-responsivo {
+            font-size: 1rem;
+            font-weight: bold;
+        }
         .texto-responsivo {
+            font-size: 0.8rem;
+            margin: 0 30px;
+        }
+        .texto2-responsivo {
             font-size: 0.8rem;
             margin: 0 30px;
         }

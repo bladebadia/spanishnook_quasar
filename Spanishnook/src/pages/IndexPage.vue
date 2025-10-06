@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <div>
+    <div style="margin-bottom: 60px;">
       <q-img style="width: 100%; max-height: 600px;" 
         fit="cover" position="center" src="/img/banner_1920.jpg"
          >
@@ -8,7 +8,7 @@
       </q-img>
     </div>
 
-    <div class="column items-center text-justify q-my-lg q-ma-md-md">
+    <div class="column items-center text-justify " style="margin-bottom: 60px;" >
       <p class=" titulo-responsivo" style="color: #851319">
        {{ t('indexeUnLugarDonde') }}
       </p>
@@ -30,11 +30,11 @@
     <!--Tarjeta descubre nuestras clases y lista  -->
     <div
       v-intersect="onPromoIntersect"
-      class="row justify-center q-my-xl q-my-md-xl">
+      class="row justify-center q-my-xl">
       <transition enter-active-class="animated fadeInUpBig slower ">
         <div v-if="showPromoCard" class="row align-center" >
           <div class="col-12 col-md-6 items-center flex flex-center column q-pa-xs-none q-pa-lg ">           
-            <q-card class="q-pa-lg " style="width: 80%;" >
+            <q-card class="" style="width: 80%;" >
               <img src="img/Home/tarjeta1_descubre_nuestras_clases.png"
                 fit="cover"
                 style="width: 80%; height: auto; display: block; margin: 0 auto;"/>
@@ -200,15 +200,15 @@
 
     <!-- Sección de FAQs -->
     <div class="q-my-xl faqs-section">
-      <p class="titulo-responsivo text-center q-mb-lg">{{t('indexPreguntasFrecuentes')}}</p>
-      <q-expansion-item class=" q-mb-md" expand-separator>
+      <p class="subtitulo-responsivo text-center " style="margin-bottom: 40px;">{{t('indexPreguntasFrecuentes')}}</p>
+      <q-expansion-item class=" q-mb-xl" expand-separator>
         <template v-slot:header>
           <q-item-section avatar>
             <q-avatar icon="help" color="primary" text-color="white" class="faqs-icon" />
           </q-item-section>
-          <p class="subtitulo-responsivo">{{t('indexComoFuncionanClases')}}</p>
+          <p class="subtitulo2-responsivo">{{t('indexComoFuncionanClases')}}</p>
         </template>
-        <div class="texto-responsivo text-justify q-px-xl q-mx-md">
+        <div class="texto2-responsivo text-justify q-px-xl q-mx-md">
           {{t('indexTodasClasesEnVivo')}}
         </div>
       </q-expansion-item>
@@ -218,9 +218,9 @@
           <q-item-section avatar>
             <q-avatar icon="help" color="primary" text-color="white" class="faqs-icon" />
           </q-item-section>
-          <p class="subtitulo-responsivo">{{t('indexQueNecesitoParaEmpezar')}}</p>
+          <p class="subtitulo2-responsivo">{{t('indexQueNecesitoParaEmpezar')}}</p>
         </template>
-        <div class="texto-responsivo text-justify q-px-xl q-mx-md">
+        <div class="texto2-responsivo text-justify q-px-xl q-mx-md">
          {{t('indexSoloNecesito')}}
         </div>
       </q-expansion-item>
@@ -230,9 +230,9 @@
           <q-item-section avatar>
             <q-avatar icon="help" color="primary" text-color="white" class="faqs-icon" />
           </q-item-section>
-          <p class="subtitulo-responsivo">{{t('indexPuedoCambiarDeModalidad')}}</p>
+          <p class="subtitulo2-responsivo">{{t('indexPuedoCambiarDeModalidad')}}</p>
         </template>
-        <div class="texto-responsivo text-justify q-px-xl q-mx-md">
+        <div class="texto2-responsivo text-justify q-px-xl q-mx-md">
           {{t('indexClaroQueremos')}}
         </div>
       </q-expansion-item>
@@ -242,9 +242,9 @@
           <q-item-section avatar>
             <q-avatar icon="help" color="primary" text-color="white" class="faqs-icon" />
           </q-item-section>
-          <p class="subtitulo-responsivo">{{t('indexQueNivelDeEspañol')}}</p>
+          <p class="subtitulo2-responsivo">{{t('indexQueNivelDeEspañol')}}</p>
         </template>
-        <div class="texto-responsivo text-justify q-px-xl q-mx-md" >
+        <div class="texto2-responsivo text-justify q-px-xl q-mx-md" >
           {{t('indexNoNecesitoNingun')}}
         </div>
       </q-expansion-item>
@@ -254,9 +254,9 @@
           <q-item-section avatar>
             <q-avatar icon="help" color="primary" text-color="white"  />
           </q-item-section>
-          <p class="subtitulo-responsivo">{{t('indexQuePasaSiNoPuedoAsistir')}}</p>
+          <p class="subtitulo2-responsivo">{{t('indexQuePasaSiNoPuedoAsistir')}}</p>
         </template>
-        <div class="texto-responsivo text-justify q-px-xl q-mx-md" style="font-size: 1.2rem">
+        <div class="texto2-responsivo text-justify q-px-xl q-mx-md" style="font-size: 1.2rem">
           {{t('indexDependeraDeLaModalidad')}}
         </div>
       </q-expansion-item>
