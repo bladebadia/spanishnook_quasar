@@ -22,6 +22,7 @@
           :to="buttonLink"
           class="btn-tarjeta-fixed"
           unelevated
+          @click="handleButtonClick"
         >
           {{ buttonText }}
         </q-btn>
@@ -38,11 +39,22 @@ interface Props {
   title: string;
   description: string;
   buttonText: string;
-  buttonLink: string;
+  buttonLink?: string;
   imageStyle?: string;
+
 }
 
 const props = defineProps<Props>();
+
+// Definir el emit para el evento del botón
+const emit = defineEmits<{
+  buttonClick: []
+}>();
+
+const handleButtonClick = () => {
+  emit('buttonClick');
+};
+
 
 const computedImageStyle = computed(() => {
   const baseStyle = 'max-height: 350px; width: 100%; margin: 0 auto; display: block';

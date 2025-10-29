@@ -1,45 +1,41 @@
 <!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <template>
   <q-page class="row items-center justify-evenly">
-    <div v-if="!testCompleted && currentQuestion === 0 && !showResults">
+    <!-- Pagina de instrucciones -->
+    <div v-if="!testCompleted && currentQuestion === 0 && !showResults" class="col-12">
       <q-card flat bordered class="instruction-card">
         <q-card-section class="text-center q-pb-none">
           <q-icon name="quiz" size="4rem" color="primary" />
         </q-card-section>
         <q-card-section class="text-center">
-          <h2 class="text-h3 text-primary text-weight-bold q-mb-md">Test de Nivel de Español</h2>
-          <p class="text-h6 text-grey-7 q-mb-lg">Evalúa tu conocimiento del idioma español</p>
+          <h2 class="text-h3 text-primary text-weight-bold q-mb-md">{{ t('testTestDeNivel') }}</h2>
+          <p class="text-h6 text-grey-7 q-mb-lg">{{ t('testEvaluaTuNivel') }}</p>
 
           <div class="text-left q-mb-lg">
-            <h3 class="text-h5 text-weight-bold q-mb-md">Instrucciones:</h3>
+            <h3 class="text-h5 text-weight-bold q-mb-md">{{ t('testInstrucciones') }}</h3>
             <ul class="text-body1 text-grey-8">
-              <li class="q-mb-sm">El test consta de 25 preguntas secuenciadas por niveles</li>
+              <li class="q-mb-sm">{{ t('testElTestConsta') }}</li>
               <li class="q-mb-sm">
-                Cada pregunta tiene 3 opciones de respuesta, selecciona una. Cuando creas que no
-                sabes/puedes continuar con el test, deja las preguntas en blanco
+                {{ t('testCadaPreguntaTiene') }}
               </li>
               <li class="q-mb-sm">
-                Al completar el test recibirás tu nivel de español (A1, A2, B1, B2, C1). Ten en
-                cuenta: el resultado de este test es una orientación aproximada de tu nivel de
-                español. No sustituye a una evaluación oficial.
+                {{ t('testAlCompletar') }}
               </li>
-              <li class="q-mb-sm">El test toma aproximadamente 10 minutos</li>
+              <li class="q-mb-sm">{{ t('testElTestToma') }}</li>
             </ul>
           </div>
 
           <q-btn
             size="lg"
             color="primary"
-            label="Comenzar Test"
+            :label="t('testComenzarTest')"
             icon="play_arrow"
             class="q-px-xl"
             @click="currentQuestion = 1"
           />
         </q-card-section>
       </q-card>
-
     </div>
-
 
     <!-- Questions Page -->
     <div v-if="!testCompleted && currentQuestion > 0 && !showResults">
@@ -52,7 +48,8 @@
                 <div class="row items-center q-mb-sm">
                   <div class="col">
                     <span class="text-body2 text-grey-6">
-                      Pregunta {{ currentQuestion }} de {{ testQuestions.length }}
+                      {{ t('testPregunta') }} {{ currentQuestion }} {{ t('testDe') }}
+                      {{ testQuestions.length }}
                     </span>
                   </div>
                   <div class="col-auto">
@@ -93,7 +90,7 @@
               <div class="row justify-between">
                 <q-btn
                   v-if="currentQuestion > 1"
-                  label="Anterior"
+                  :label="t('testAnterior')"
                   icon="chevron_left"
                   color="grey-6"
                   flat
@@ -103,7 +100,7 @@
                 <!-- Boton siguiente o finalizar -->
                 <q-btn
                   v-if="currentQuestion < testQuestions.length"
-                  label="Siguiente"
+                  :label="t('testSiguiente')"
                   icon-right="chevron_right"
                   color="primary"
                   :disable="selectedAnswers[currentQuestion - 1] === undefined"
@@ -111,7 +108,7 @@
                 />
                 <q-btn
                   v-if="currentQuestion === testQuestions.length"
-                  label="Finalizar Test"
+                  :label="t('testFinalizarTest')"
                   icon-right="check"
                   color="positive"
                   :disable="selectedAnswers[currentQuestion - 1] === undefined"
@@ -123,14 +120,14 @@
         </div>
       </div>
     </div>
+
     <!-- Results Page -->
-    <div v-if="showResults">
-      <div class="row justify-center">
-        <div class="col-12 col-md-8">
+      <div class="row  items-center full-width" v-if="showResults">
+        <div  class="column full-width items-center">
           <q-card flat bordered class="results-card">
             <q-card-section class="text-center">
               <q-icon name="emoji_events" size="4rem" color="positive" class="q-mb-md" />
-              <h2 class="text-h3 text-primary text-weight-bold q-mb-md">¡Test Completado!</h2>
+              <p class="text-h4 text-primary text-weight-bold q-mb-md">{{t('testTestCompletado')}}</p>
 
               <div class="row justify-center items-center q-mb-lg">
                 <div class="col-12 col-sm-6 text-center">
@@ -147,57 +144,53 @@
                     </div>
                   </q-circular-progress>
                   <div class="text-body1 text-grey-7">
-                    {{ Math.round((testScore / testQuestions.length) * 100) }}% Correcto
+                    {{ Math.round((testScore / testQuestions.length) * 100) }}{{t('testCorrecto')}}
                   </div>
                 </div>
 
                 <div class="col-12 col-sm-6 text-center">
-                  <div class="text-h4 text-weight-bold text-primary q-mb-sm">Tu Nivel:</div>
+                  <div class="text-h4 text-weight-bold text-primary q-mb-sm">{{t('testTuNivel')}}</div>
                   <q-chip
                     :label="testLevel"
-                    color="primary"
+                    color="black"
                     text-color="white"
-                    size="lg"
+                    size="xl"
                     class="q-pa-md"
                   />
                   <div class="text-body2 text-grey-7 q-mt-sm">
                     <span v-if="testLevel.includes('A1')">
-                      Acceso - Conoces lo básico del español: presentarse, hablar de uno mismo y
-                      usar frases básicas de uso cotidiano.
+                      {{ t('testAccesoConocesLo') }}
                     </span>
                     <span v-else-if="testLevel.includes('A2')">
-                      Plataforma - Puedes comunicarte en situaciones simples con frases sencillas
-                      para la vida diaria: compras, trabajo, familia y ocio.
+                      {{ t('testPlataformaPuedes') }}
                     </span>
                     <span v-else-if="testLevel.includes('B1')">
-                      Umbral - Tienes dominio intermedio del idioma. Eres capaz de entender y
-                      desenvolverte en conversaciones y textos claros. Hablar de experiencias y
-                      planes.
+                      {{ t('testUmbralTienes') }}
                     </span>
                     <span v-else-if="testLevel.includes('B2')">
-                      Avanzado - Puedes comunicarte con fluidez con personas nativas, expresar
-                      opiniones y entender temas complejos.
+                      {{ t('testAvanzadoPuedes') }}
                     </span>
                     <span v-else-if="testLevel.includes('C1')">
-                      Dominio - Te expresas con soltura y naturalidad en casi cualquier situación.
+                      {{ t('testDominioTeExpresas') }}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div class="q-gutter-md">
-                <q-btn label="Repetir Test" icon="refresh" color="secondary" @click="restartTest" />
+                <q-btn :label="t('testRepetirTest')" icon="refresh" color="secondary" @click="restartTest" />
               </div>
             </q-card-section>
           </q-card>
         </div>
       </div>
-    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 //import { useQuasar } from 'quasar';
 
 //const $q = useQuasar();
@@ -429,6 +422,69 @@ const previousQuestion = () => {
 // testLevel.value = getTestLevel(score);
 </script>
 
+<style scoped>
+.instruction-card {
+  max-width: 800px;
+  margin: 0 auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
 
-  git config --global user.email "you@example.com"
-  git config --global user.name "Your Name"
+.question-card {
+  max-width: 900px;
+  margin: 0 auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.results-card {
+  width: 60%;
+  margin: 0 auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Estilos para los botones de respuesta */
+.q-btn {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.q-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Animaciones para transiciones */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .instruction-card,
+  .question-card {
+    margin: 10px;
+  }
+  .results-card {
+    margin: 10px;
+    width: 80%;
+  }
+
+  .text-h3 {
+    font-size: 1.8rem;
+  }
+
+  .text-h4 {
+    font-size: 1.5rem;
+  }
+
+  .text-h5 {
+    font-size: 1.3rem;
+  }
+}
+</style>

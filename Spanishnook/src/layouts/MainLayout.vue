@@ -523,7 +523,7 @@ function toggleLeftDrawer() {
   
   /* Escritorio pequeño */
   @media (min-width: 1024px) and (max-width: 1439px) {
-    font-size: 1.5rem !important;
+    font-size: 1rem !important;
   }
   
   
@@ -580,17 +580,16 @@ function toggleLeftDrawer() {
   align-items: center;
   justify-content: center;
   gap: 46px; /* Espaciado entre botones */
-  
-  @media (min-width: 600px) and (max-width: 1023px) {
-    gap: 12px;
-  }
-  
+  margin-right: 6%;
+    
   @media (min-width: 1024px) {
     gap: 20px;
+    margin-right: 1%;
   }
   
   @media (min-width: 1440px) {
     gap: 24px;
+    margin-right: 6%;
   }
 }  
   

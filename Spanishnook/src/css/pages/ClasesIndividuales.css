@@ -1,0 +1,299 @@
+.custom-calendar {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden; /* Prevenir desbordamiento */
+}
+
+.time-btn {
+  min-width: 80px;
+  font-weight: bold;
+}
+
+:deep(.q-date__calendar-item) {
+  height: 40px;
+  width: 40px;
+  font-size: 14px;
+}
+
+/* Pantallas extra pequeñas (menos de 400px) */
+@media (max-width: 399px) {
+  .custom-calendar {
+    width: 95%;
+    max-width: 95%;
+    font-size: 10px;
+  }
+
+  :deep(.q-date) {
+    font-size: 10px;
+  }
+
+  :deep(.q-date__header) {
+    padding: 4px;
+  }
+
+  :deep(.q-date__calendar-item) {
+    height: 22px !important;
+    width: 22px !important;
+    font-size: 9px !important;
+    min-width: 22px !important;
+    padding: 1px !important;
+    margin: 0 !important;
+  }
+
+  :deep(.q-date__calendar-weekdays) {
+    padding: 2px 4px;
+  }
+
+  :deep(.q-date__calendar-weekdays > div) {
+    height: 18px;
+    font-size: 8px;
+    padding: 1px;
+    min-width: 22px;
+  }
+
+  :deep(.q-date__navigation) {
+    padding: 2px 4px;
+  }
+
+  :deep(.q-date__header-title) {
+    font-size: 12px;
+  }
+
+  :deep(.q-date__header-subtitle) {
+    font-size: 10px;
+  }
+
+  :deep(.q-btn) {
+    min-height: 28px;
+    padding: 2px 4px;
+    font-size: 10px;
+  }
+
+  :deep(.q-date__actions .q-btn) {
+    font-size: 9px;
+    padding: 1px 4px;
+    min-height: 24px;
+  }
+
+  /* Forzar el ancho de la tabla del calendario */
+  :deep(.q-date__calendar-days) {
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  :deep(.q-date__calendar-days td) {
+    width: 14.28% !important; /* 100% / 7 días */
+    max-width: 14.28% !important;
+    padding: 0 !important;
+  }
+
+  /* Contenedor del calendario más compacto */
+  :deep(.q-date__main) {
+    padding: 2px !important;
+  }
+
+  /* Botones de tiempo más pequeños */
+  .time-btn {
+    min-width: 45px;
+    font-size: 10px;
+    padding: 4px 6px;
+    margin: 2px;
+  }
+
+  /* Ajustar el contenedor principal */
+  .col-md-6 {
+    padding: 0 4px;
+  }
+  
+  .col-md-5 {
+    padding: 0 4px;
+  }
+}
+
+/* Móvil pequeño (400px - 480px) */
+@media (min-width: 400px) and (max-width: 480px) {
+  .custom-calendar {
+    width: 90%;
+    max-width: 90%;
+  }
+
+  :deep(.q-date) {
+    font-size: 12px;
+  }
+
+  :deep(.q-date__header) {
+    padding: 6px;
+  }
+
+  :deep(.q-date__calendar-item) {
+    height: 26px !important;
+    width: 26px !important;
+    font-size: 10px !important;
+    min-width: 26px !important;
+    padding: 1px !important;
+  }
+
+  :deep(.q-date__calendar-weekdays) {
+    padding: 3px 6px;
+  }
+
+  :deep(.q-date__calendar-weekdays > div) {
+    height: 22px;
+    font-size: 9px;
+    padding: 1px;
+  }
+
+  :deep(.q-date__navigation) {
+    padding: 3px 6px;
+  }
+
+  :deep(.q-date__header-title) {
+    font-size: 13px;
+  }
+
+  :deep(.q-date__header-subtitle) {
+    font-size: 11px;
+  }
+
+  :deep(.q-btn) {
+    min-height: 30px;
+    padding: 3px 6px;
+  }
+
+  :deep(.q-date__actions .q-btn) {
+    font-size: 10px;
+    padding: 2px 5px;
+    min-height: 26px;
+  }
+
+  .time-btn {
+    min-width: 55px;
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+}
+
+/* Móvil medio (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .custom-calendar {
+    width: 85%;
+    max-width: 85%;
+    min-height: 350px;
+    max-height: 400px;
+  }
+
+  :deep(.q-date__calendar-item) {
+    height: 35px !important;
+    width: 35px !important;
+    font-size: 13px !important;
+    min-width: 35px !important;
+  }
+
+  :deep(.q-date__calendar-weekdays > div) {
+    height: 28px;
+    font-size: 11px;
+  }
+
+  :deep(.q-date__header-title) {
+    font-size: 16px;
+  }
+
+  .time-btn {
+    min-width: 70px;
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .custom-calendar {
+    max-width: 700px;
+    min-height: 450px;
+  }
+
+  :deep(.q-date__calendar-item) {
+    height: 50px;
+    width: 50px;
+    font-size: 16px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .custom-calendar {
+    max-width: 800px;
+    min-height: 500px;
+  }
+
+  :deep(.q-date__calendar-item) {
+    height: 55px;
+    width: 55px;
+    font-size: 17px;
+  }
+}
+
+/* Pantallas grandes */
+@media (min-width: 1440px) {
+  .custom-calendar {
+    max-width: 800px;
+    min-height: 550px;
+  }
+
+  :deep(.q-date__calendar-item) {
+    height: 60px;
+    width: 60px;
+    font-size: 18px;
+  }
+}
+
+/* Prevenir desbordamiento horizontal en TODOS los tamaños */
+:deep(.q-date__calendar) {
+  overflow-x: hidden !important;
+  width: 100% !important;
+}
+
+:deep(.q-date__calendar-days) {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+:deep(.q-date__calendar-days td) {
+  max-width: 14.28% !important;
+  overflow: hidden !important;
+}
+
+/* Días deshabilitados */
+:deep(.q-date__calendar-item--disabled) {
+  color: #bdbdbd !important;
+  background-color: #f5f5f5;
+}
+
+/* Asegurar que el contenedor padre no cause overflow */
+.row.q-col-gutter-lg {
+  overflow-x: hidden;
+}
+
+.col-md-6, .col-md-5 {
+  overflow-x: hidden;
+}
+
+/* Responsive para el contenedor general en pantallas muy pequeñas */
+@media (max-width: 399px) {
+  .q-col-gutter-lg {
+    margin: 0 -2px;
+  }
+  
+  .q-col-gutter-lg > div {
+    padding: 0 2px;
+  }
+  
+  .q-pa-md {
+    padding: 8px !important;
+  }
+  
+  .q-mb-lg {
+    margin-bottom: 16px !important;
+  }
+}

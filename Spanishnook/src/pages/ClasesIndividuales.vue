@@ -1,26 +1,106 @@
 <template>
-  <q-page class="q-pa-lg">
-    <!-- Encabezado -->
-    <div class="text-center q-mb-xl">
-      <h3 class="text-primary">CLASES INDIVIDUALES</h3>
-      <p class="text-grey-8">Reserva tu clase de español personalizada</p>
-    </div>
+  <q-page >
+    <div v-if="!seleccionClases">
+      <div style="margin-bottom: 60px;">
+        <q-img style="width: 100%; max-height: 600px;" 
+          fit="cover" position="center" src="/img/estudiante_1024.jpg">        
+        </q-img>
+      </div>
 
+      <div class="column items-center text-justify " style="margin-bottom: 60px;" >
+        <p class=" titulo-responsivo" style="color: #851319">
+          {{ t('individuales.nuestrasClases') }}
+        </p>
+
+        <p class="q-mt-md texto-responsivo" >
+          {{ t('individuales.textoNuestrasClases') }}
+        </p>
+        <q-btn
+          class="oval-btn"
+          items-center
+          color="primary"
+          unelevated
+          @click="activarSeleccionClases"
+      >
+        {{ t('individuales.botonSeleccionaClase') }}
+        </q-btn>
+      </div>
+
+      <!-- Banner promocional test nivel -->
+      <div
+        class="q-mt-xl q-mb-xl row degradado-fondo"
+        style="min-height: 400px; width: 100%"
+        >
+        <div
+          class="row"
+          style="width: 100%; position: relative"
+          >
+          <div class="col-12 q-pa-none q-pa-md-lg" style="position: absolute; top: 20%; ">
+            <p class="titulo-responsivo " style="color: #fffdf8">
+              <strong>{{ t('indexDescubreTuPunto') }}</strong>
+            </p>
+            <p class="texto-responsivo" style=" color: #fffdf8">
+              {{ t('indexEnSolo') }}
+            </p>
+            <q-btn
+              color="black"
+              @click="activarSeleccionClases"
+              class="oval-btn q-mx-lg"
+              unelevated
+              >{{ t('indexHacerTest') }}</q-btn
+            >
+          </div>
+        </div>
+      </div>
+   
+      <q-separator class="q-my-xl" />
+
+      <div class="col-12 row  justify-center ">
+        <!-- Componente 1:  -->
+        <PromoCard
+          :image-src="'img/45sintitulo.png'"
+          :title="t('individuales.tituloClasesA1')"
+          :description="t('individuales.textoClasesA1')"
+          :button-text="t('individuales.botonClasesA1')"
+          @button-click="activarSeleccionClases"
+          />
+        <!-- Componente 2:  -->
+        <PromoCard
+          :image-src="'img/44sintitulo.png'"
+          :title="t('individuales.tituloClasesB1')"
+          :description="t('individuales.textoClasesB1')"
+          :button-text="t('individuales.botonClasesB1')"
+          @button-click="activarSeleccionClases"
+          />
+        <!-- Componente 3:  -->
+        <PromoCard
+          :image-src="'img/48sintitulo.png'"
+          :title="t('individuales.tituloClasesConversacion')"
+          :description="t('individuales.textoClasesConversacion')"
+          :button-text="t('individuales.botonClasesConversacion')"
+          @button-click="activarSeleccionClases"
+          />            
+      </div>
+    </div>
     <!-- Contenido principal en dos columnas -->
-    <div class="row q-col-gutter-lg">
-      <!-- Columna izquierda: Carrito + Reservas -->
-      <div class="col-12 col-md-5">
-        <!-- Carrito -->
-        <div v-if="carrito.length > 0" class="q-mb-lg bg-yellow-2 q-pa-md rounded-borders shadow-2">
-          <h5>🛒 Carrito de Reservas</h5>
-          <q-list>
+    <div v-if="seleccionClases">
+      <div class="row q-col-gutter-lg">
+        <p class="titulo-responsivo text-center q-my-xl" style="width: 100%; color: #851319">
+          {{ t('individuales.reservaTuClase') }}
+        </p>
+        <!-- Columna izquierda: Carrito + Reservas -->
+        <div class="col-12 col-md-5">
+          <!-- Carrito -->
+          <div v-if="carrito.length > 0" class="q-mb-lg bg-yellow-2 q-pa-md rounded-borders shadow-2">
+            <h5>🛒{{ t('individuales.carritoDeReservas') }}</h5>
+            <q-list>
             <q-item v-for="(reserva, index) in carrito" :key="index">
               <q-item-section>
                 <q-item-label>
-                  {{ formatFecha(reserva.fecha) }} a las {{ reserva.hora }}
+                  {{ formatFecha(reserva.fecha) }} {{ t('individuales.aLas') }} {{ reserva.hora }}
                 </q-item-label>
                 <q-item-label caption>
-                  {{ reserva.tipo === 'normal' ? 'Clase Normal' : 'Clase Conversación' }} -
+                  {{ reserva.tipo === 'normal' ? t('individuales.claseNormal') : t('individuales.claseConversacion') }} -
                   {{ reserva.tipo === 'normal' ? '32€' : '20€' }}
                 </q-item-label>
               </q-item-section>
@@ -35,63 +115,61 @@
               </q-item-section>
             </q-item>
             <div class="q-mt-md text-center">
-              <q-btn color="primary" label="Ir al Carrito" to="/CarritoCompra" />
+              <q-btn color="primary" :label="t('individuales.botonIrAlCarrito')" to="/CarritoCompra" />
             </div>
-          </q-list>
-        </div>
+            </q-list>
+          </div>
 
-        <!-- Mis reservas -->
-        <div class="q-mt-lg">
-          <h5>Mis Reservas Confirmadas</h5>
-          <q-list bordered v-if="misReservas.length > 0">
-            <q-item v-for="reserva in misReservas" :key="reserva.id" class="q-mb-sm">
-              <q-item-section>
-                <q-item-label>
-                  {{ formatFecha(reserva.fecha) }} a las {{ reserva.hora.slice(0, 5) }}
-                </q-item-label>
-                <q-item-label caption>
-                  {{ getTipoClaseTexto(reserva) }} - {{ getPrecioClase(reserva) }}€
-                </q-item-label>
-                <q-item-label caption v-if="!puedeCancelar(reserva)" class="text-negative">
-                  No se puede cancelar (menos de 72 horas)
-                </q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <q-btn
-                  color="negative"
-                  icon="delete"
-                  @click="cancelarReserva(reserva)"
-                  size="sm"
-                  :disable="!puedeCancelar(reserva)"
-                  :title="
-                    !puedeCancelar(reserva)
-                      ? 'No se puede cancelar con menos de 72 horas de antelación'
-                      : 'Cancelar reserva'
-                  "
-                />
-              </q-item-section>
-            </q-item>
-          </q-list>
-          <p v-else class="text-grey q-mt-sm">No tienes reservas confirmadas.</p>
+          <!-- Mis reservas -->
+          <div class="q-mt-lg">
+            <h5>{{ t('individuales.misReservasConfirmadas') }}</h5>
+            <q-list bordered v-if="misReservas.length > 0">
+              <q-item v-for="reserva in misReservas" :key="reserva.id" class="q-mb-sm">
+                <q-item-section>
+                  <q-item-label>
+                    {{ formatFecha(reserva.fecha) }} {{ t('individuales.aLas') }} {{ reserva.hora.slice(0, 5) }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ getTipoClaseTexto(reserva) }} - {{ getPrecioClase(reserva) }}€
+                  </q-item-label>
+                  <q-item-label caption v-if="!puedeCancelar(reserva)" class="text-negative">
+                    {{t('individuales.noSePuede')}}
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-btn
+                    color="negative"
+                    icon="delete"
+                    @click="cancelarReserva(reserva)"
+                    size="sm"
+                    :disable="!puedeCancelar(reserva)"
+                    :title="
+                      !puedeCancelar(reserva)
+                        ? t('individuales.noSePuedeCancelar')
+                        : t('individuales.cancelarReserva') " />
+                </q-item-section>
+              </q-item>
+            </q-list>
+            <p v-else class="text-grey q-mt-sm">{{t('individuales.noTienesReservas')}}</p>
+          </div>
         </div>
-      </div>
 
       <!-- Columna derecha: Selector + Calendario + Horarios -->
       <div class="col-12 col-md-6">
         <div class="q-mb-md">
           <q-card class="q-pa-md shadow-1 rounded-borders">
             <q-card-section class="q-pa-sm">
-              <div class="text-h6 text-center q-mb-md">Tipo de Clase</div>
-              <q-option-group
-                v-model="tipoClase"
-                :options="opcionesTipoClase"
-                color="primary"
-                inline
-                class="justify-center"
-              />
+              <div class="text-h6 text-center q-mb-md">{{t('individuales.tipoDeClase')}}</div>
+                <q-option-group
+                  v-model="tipoClase"
+                  :options="opcionesTipoClase"
+                  color="primary"
+                  inline
+                  class="justify-center"
+                  />
               <div class="text-center q-mt-sm">
                 <q-badge color="primary" class="q-px-sm q-py-xs text-subtitle1">
-                  Precio: {{ tipoClase === 'normal' ? '32€' : '20€' }}
+                  {{t('individuales.precio')}} {{ tipoClase === 'normal' ? '32€' : '20€' }}
                 </q-badge>
               </div>
             </q-card-section>
@@ -119,7 +197,7 @@
 
         <!-- Horarios disponibles -->
         <div v-if="fechaSeleccionada" class="q-mt-lg">
-          <h5>Horarios disponibles para {{ formatFecha(fechaSeleccionada) }}</h5>
+          <h5>{{t('individuales.horariosDisponiblesPara')}} {{ formatFecha(fechaSeleccionada) }}</h5>
 
           <div v-if="horariosDisponiblesFiltrados.length > 0" class="row q-gutter-sm q-mt-md">
             <q-btn
@@ -137,6 +215,7 @@
         </div>
       </div>
     </div>
+    </div>
   </q-page>
 </template>
 
@@ -145,7 +224,12 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useAuth } from 'src/stores/auth';
 import { supabase } from 'src/supabaseClient';
 import { useQuasar } from 'quasar';
+import { useI18n } from 'vue-i18n';
+import '../css/pages/ClasesIndividuales.css';
+import '../css/pages/EstilosGenerales.css';
+import PromoCard from '../components/PromoCard.vue';
 const $q = useQuasar();
+const {  t , locale} = useI18n();
 
 interface ReservaCarrito {
   id?: string;
@@ -166,24 +250,30 @@ interface ReservaConfirmada {
 }
 
 const { user } = useAuth();
-
+const seleccionClases = ref<string | null>(null);
 const fechaSeleccionada = ref('');
 const horasOcupadas = ref<string[]>([]);
 const misReservas = ref<ReservaConfirmada[]>([]);
 const carrito = ref<ReservaCarrito[]>([]);
 const tipoClase = ref<'normal' | 'conversacion'>('normal');
 
-// Opciones para el selector de tipo de clase
-const opcionesTipoClase = [
+
+const activarSeleccionClases = () => {
+  seleccionClases.value = 'activa';
+};
+
+
+// Cambiar de array estático a computed reactivo
+const opcionesTipoClase = computed(() => [
   {
-    label: 'Clase Normal (32€)',
+    label: `${t('individuales.claseNormal')} 32€`,
     value: 'normal',
   },
   {
-    label: 'Clase Conversación (20€)',
+    label: `${t('individuales.claseConversacion')} 20€`,
     value: 'conversacion',
   },
-];
+]);
 
 // Fechas mínima y máxima (3 meses vista)
 const fechaMinima = new Date().toISOString().split('T')[0];
@@ -241,7 +331,9 @@ const opcionesFechas = (date: string) => {
 
 // Función para obtener el texto del tipo de clase
 const getTipoClaseTexto = (reserva: ReservaConfirmada): string => {
-  return reserva.tipo === 'normal' ? 'Clase Normal' : 'Clase Conversación';
+ return reserva.tipo === 'normal' 
+    ? t('individuales.claseNormal') 
+    : t('individuales.claseConversacion');
 };
 
 // Función para obtener el precio
@@ -249,10 +341,17 @@ const getPrecioClase = (reserva: ReservaConfirmada): number => {
   return reserva.tipo === 'normal' ? 32 : 20;
 };
 
-// Formatear fecha en español
+// Función formatFecha mejorada con i18n
 const formatFecha = (fecha: string) => {
   const d = new Date(fecha);
-  return d.toLocaleDateString('es-ES', {
+  console.log('Formato de fecha para:', locale.value);
+  // Usar el locale actual de i18n
+  const currentLocale = locale.value === 'es-ES' ? 'es-ES' : 
+                       locale.value === 'en-US' ? 'en-US' :
+                       locale.value === 'fr-FR' ? 'fr-FR' : 'es-ES'; // Por defecto español
+
+  console.log('Formato de fecha para:', locale.value, '->', currentLocale);
+  return d.toLocaleDateString(currentLocale, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -476,76 +575,7 @@ watch(
     }
   },
 );
+
+
 </script>
 
-<style scoped>
-.custom-calendar {
-  max-width: 800px;
-  min-height: 500px;
-}
-
-.time-btn {
-  min-width: 80px;
-  font-weight: bold;
-}
-
-/* Personalización del calendario */
-.custom-calendar {
-  width: 100%;
-  min-height: 400px;
-}
-
-:deep(.q-date__calendar-item) {
-  height: 40px;
-  width: 40px;
-  font-size: 14px;
-}
-
-/* Tablet */
-@media (min-width: 768px) {
-  .custom-calendar {
-    max-width: 700px;
-    min-height: 450px;
-  }
-
-  :deep(.q-date__calendar-item) {
-    height: 50px;
-    width: 50px;
-    font-size: 16px;
-  }
-}
-
-/* Desktop */
-@media (min-width: 1024px) {
-  .custom-calendar {
-    max-width: 800px;
-    min-height: 500px;
-  }
-
-  :deep(.q-date__calendar-item) {
-    height: 55px;
-    width: 55px;
-    font-size: 17px;
-  }
-}
-
-/* Pantallas grandes */
-@media (min-width: 1440px) {
-  .custom-calendar {
-    max-width: 900px;
-    min-height: 550px;
-  }
-
-  :deep(.q-date__calendar-item) {
-    height: 60px;
-    width: 60px;
-    font-size: 18px;
-  }
-}
-
-/* Días deshabilitados */
-:deep(.q-date__calendar-item--disabled) {
-  color: #bdbdbd !important;
-  background-color: #f5f5f5;
-}
-</style>
